@@ -15,11 +15,13 @@ h2 {
 }
 
 .headline {
+    width: 1900px;
     position: relative; 
     display: flex;
     font-size: 16px;
     font-family: "Lato", sans-serif;
     font-weight: 700;
+    margin: auto;
 }
 .headline h3 {
     margin: 0; 
@@ -28,17 +30,17 @@ h2 {
     top: 0; 
 }
 .headline h3:nth-child(1) {
-    left: 500px; 
+    left: 450px; 
 }
 .headline h3:nth-child(2) {
-    left: 900px; 
+    left: 850px; 
 }
 .headline h3:nth-child(3) {
-    left: 1300px; 
+    left: 1250px; 
 }
 
 .headline h3:nth-child(4) {
-    left: 1700px; 
+    left: 1650px; 
 }
 .container {
     margin: 35px auto;
