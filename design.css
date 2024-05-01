@@ -15,13 +15,11 @@ h2 {
 }
 
 .headline {
-    width: 1900px;
     position: relative; 
     display: flex;
     font-size: 16px;
     font-family: "Lato", sans-serif;
     font-weight: 700;
-    margin: auto;
 }
 .headline h3 {
     margin: 0; 
@@ -30,17 +28,17 @@ h2 {
     top: 0; 
 }
 .headline h3:nth-child(1) {
-    left: 450px; 
+    left: 500px; 
 }
 .headline h3:nth-child(2) {
-    left: 850px; 
+    left: 900px; 
 }
 .headline h3:nth-child(3) {
-    left: 1250px; 
+    left: 1300px; 
 }
 
 .headline h3:nth-child(4) {
-    left: 1650px; 
+    left: 1700px; 
 }
 .container {
     margin: 35px auto;
@@ -62,7 +60,7 @@ h2 {
     font-family: "Lato", sans-serif;
     font-weight: 700;
     font-style: normal;
-    border-right: 1px black solid;
+    border-right: 4px black solid;
 }
 .day span {
     writing-mode: vertical-lr;
@@ -73,7 +71,7 @@ h2 {
     flex-direction: column;
     width: 150px;
     height: 200px;
-    border-right: 1px black solid;
+    border-right: 4px black solid;
 }
 
 .timeSlot {
@@ -104,130 +102,10 @@ h2 {
     border-bottom: 1px black solid;
 }
 
- #MFL8 {
-    border: 0px;
- }
- #MSL8 {
-    border: 0px;
- }
- #MTL8 {
-    border: 0px;
- }
- #MLL8 {
-    border: 0px;
- }
- #MFC8 {
-    border: 0px;
- }
- #MSC8 {
-    border: 0px;
- }
- #MTC8 {
-    border: 0px;
- }
- #MLC8 {
-    border: 0px;
- }
 
- #TFL8 {
+#L8 {
     border: 0px;
- }
- #TSL8 {
-    border: 0px;
- }
- #TTL8 {
-    border: 0px;
- }
- #TLL8 {
-    border: 0px;
- }
- #TFC8 {
-    border: 0px;
- }
- #TSC8 {
-    border: 0px;
- }
- #TTC8 {
-    border: 0px;
- }
- #TLC8 {
-    border: 0px;
- }
-
- #WFL8 {
-    border: 0px;
- }
- #WSL8 {
-    border: 0px;
- }
- #WTL8 {
-    border: 0px;
- }
- #WLL8 {
-    border: 0px;
- }
- #WFC8 {
-    border: 0px;
- }
- #WSC8 {
-    border: 0px;
- }
- #WTC8 {
-    border: 0px;
- }
- #WLC8 {
-    border: 0px;
- }
-
- #ThFL8 {
-    border: 0px;
- }
- #ThSL8 {
-    border: 0px;
- }
- #ThTL8 {
-    border: 0px;
- }
- #ThLL8 {
-    border: 0px;
- }
- #ThFC8 {
-    border: 0px;
- }
- #ThSC8 {
-    border: 0px;
- }
- #ThTC8 {
-    border: 0px;
- }
- #ThLC8 {
-    border: 0px;
- }
-
- #FFL8 {
-    border: 0px;
- }
- #FSL8 {
-    border: 0px;
- }
- #FTL8 {
-    border: 0px;
- }
- #FLL8 {
-    border: 0px;
- }
- #FFC8 {
-    border: 0px;
- }
- #FSC8 {
-    border: 0px;
- }
- #FTC8 {
-    border: 0px;
- }
- #FLC8 {
-    border: 0px;
- }
+}
 
 .classroom {
     display: flex;
@@ -236,25 +114,33 @@ h2 {
     height: 200px;
     border-right: 1px black solid;
 }
-#monday {
+
+.grade {
+    display: flex;
+    flex-direction: row;
+    border-right: 1px black solid;
+}
+
+#Monday {
     border-top: 4px black solid;
     border-left: 4px black solid;
     background-color: #FFBE98 ;
 }
-#tuesday {
+#Tuesday {
     border-left: 4px black solid;
     background-color: #FFEBB2; 
 }
-#wednesday {
+#Wednesday {
     border-left: 4px black solid;
     background-color: #F3D0D7; 
 }
-#thursday {
+#Thursday {
     border-left: 4px black solid;
     background-color: #C0D6E8; 
 }
-#friday {
+#Friday {
     border-left: 4px black solid;
     border-bottom: 4px black solid;
     background-color: #C5EBAA; 
 }
+
