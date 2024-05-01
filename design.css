@@ -104,10 +104,130 @@ h2 {
     border-bottom: 1px black solid;
 }
 
-
-#L8 {
+ #MFL8 {
     border: 0px;
-}
+ }
+ #MSL8 {
+    border: 0px;
+ }
+ #MTL8 {
+    border: 0px;
+ }
+ #MLL8 {
+    border: 0px;
+ }
+ #MFC8 {
+    border: 0px;
+ }
+ #MSC8 {
+    border: 0px;
+ }
+ #MTC8 {
+    border: 0px;
+ }
+ #MLC8 {
+    border: 0px;
+ }
+
+ #TFL8 {
+    border: 0px;
+ }
+ #TSL8 {
+    border: 0px;
+ }
+ #TTL8 {
+    border: 0px;
+ }
+ #TLL8 {
+    border: 0px;
+ }
+ #TFC8 {
+    border: 0px;
+ }
+ #TSC8 {
+    border: 0px;
+ }
+ #TTC8 {
+    border: 0px;
+ }
+ #TLC8 {
+    border: 0px;
+ }
+
+ #WFL8 {
+    border: 0px;
+ }
+ #WSL8 {
+    border: 0px;
+ }
+ #WTL8 {
+    border: 0px;
+ }
+ #WLL8 {
+    border: 0px;
+ }
+ #WFC8 {
+    border: 0px;
+ }
+ #WSC8 {
+    border: 0px;
+ }
+ #WTC8 {
+    border: 0px;
+ }
+ #WLC8 {
+    border: 0px;
+ }
+
+ #ThFL8 {
+    border: 0px;
+ }
+ #ThSL8 {
+    border: 0px;
+ }
+ #ThTL8 {
+    border: 0px;
+ }
+ #ThLL8 {
+    border: 0px;
+ }
+ #ThFC8 {
+    border: 0px;
+ }
+ #ThSC8 {
+    border: 0px;
+ }
+ #ThTC8 {
+    border: 0px;
+ }
+ #ThLC8 {
+    border: 0px;
+ }
+
+ #FFL8 {
+    border: 0px;
+ }
+ #FSL8 {
+    border: 0px;
+ }
+ #FTL8 {
+    border: 0px;
+ }
+ #FLL8 {
+    border: 0px;
+ }
+ #FFC8 {
+    border: 0px;
+ }
+ #FSC8 {
+    border: 0px;
+ }
+ #FTC8 {
+    border: 0px;
+ }
+ #FLC8 {
+    border: 0px;
+ }
 
 .classroom {
     display: flex;
