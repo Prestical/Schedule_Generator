@@ -40,7 +40,7 @@ const app = Vue.createApp({
                     else if (file.name === 'busy.csv') {
                         this.busyTimes = this.parseBusy(e.target.result);
                     } else if (file.name === 'service.csv') {
-                        this.serviceCourses = this.parseService(e.target.result, this.courses);
+                        this.serviceCourses = this.parseService(e.target.result);
                     } else if (file.name === 'classroom.csv') {
                         this.classrooms = this.parseClassrooms(e.target.result);
                     }
@@ -59,7 +59,7 @@ const app = Vue.createApp({
             // Verileri parse edip ilgili state'lere ata
             this.courses = this.parseCourses(responses[0]);
             this.busyTimes = this.parseBusy(responses[1]);
-            this.serviceCourses = this.parseService(responses[2], this.courses);
+            this.serviceCourses = this.parseService(responses[2]);
             this.classrooms = this.parseClassrooms(responses[3]);
         },
         /*displaySchedule() {
@@ -121,7 +121,7 @@ const app = Vue.createApp({
             })
             return result;
         },
-        parseService(content, courses){
+        parseService(content){
             const result=[];
             const lines=content.split('\n');
             lines.forEach(line=>{
@@ -129,17 +129,11 @@ const app = Vue.createApp({
                     return;
                     const parts = line.split(',');
                     const times = parts.slice(2).map(time => time.replace(/"/g,'').trim());
-                    const courseDetails = courses.find(c => c.code === parts[0].trim());
-                    if (courseDetails) {
                         result.push({
                             name: parts[0].trim(),
                             day: parts[1].trim(),
-                            timeSlots: times.map(time => time.trim()),
-                            year: courseDetails.year,
-                            students: courseDetails.students,
-                            instructor:courseDetails.instructor.split(' ').slice(-1)
+                            timeSlots: times.map(time => time.trim())
                         });
-                    }
             })
             return result;
         },
@@ -208,12 +202,13 @@ const app = Vue.createApp({
         },
         placeServiceCourses(){
             this.serviceCourses.forEach(course=>{
-                classroom=this.getSuitableClassroom(course.students,course.timeSlots,course.day);
+                courseInfo=this.courses.find(temp => temp.code === course.name)
+                classroom=this.getSuitableClassroom(courseInfo.students,course.timeSlots,course.day);
                 if(classroom!=null){
                     this.courses=this.courses.filter(_course => _course.name !==course.name)
                     course.timeSlots.forEach(timeSlot=>{
                         const timeIndex=this.times.indexOf(timeSlot)
-                        this.schedule[course.day][timeIndex].courses[course.year-1]=[course.name,classroom,course.instructor];
+                        this.schedule[course.day][timeIndex].courses[courseInfo.year-1]=[course.name,classroom,courseInfo.instructor.split(' ').splice(-1)];
                     }) 
                     
                 }

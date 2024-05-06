@@ -4,34 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule</title>
-    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="main.js" defer></script>
     <style>
         table {
             width: 100%;
             border-collapse: collapse; 
-            table-layout:unset; 
         }
-        
         th, td {
-            border: 0.5px solid rgba(100,100,100,0.5); 
-            padding: 13px; 
+            border: 1px solid #333; 
+            text-align: center;
+            padding: 0; 
+            margin: 0;
         }
-        ul{
-            list-style-type: none;
-            border: 0.5px solid rgba(100,100,100,0.5);
-            padding: 5.3px; 
+        ul {
+            
+            list-style-type: none; 
+            margin: 0; 
+            padding: 0; 
+            width: 100%;
+            height: 100%; 
+            border: none; 
+        }
+        li {
+            border: 1px solid #000;
+            margin: 0; 
+            padding: 10px; 
+            width: auto; 
         }
         th {
-            background-color: #f4f4f8; 
+            background-color: #f4f4f8;
         }
+        .vertical-text {
+            writing-mode: vertical-lr;
+            transform: rotate(180deg); 
+            white-space: nowrap; 
+        }
+        
+        .monday { background-color: #e7f4e4; }
+        .tuesday { background-color: #e4e7f4; }
+        .wednesday { background-color: #f4e7f4; }
+        .thursday { background-color: #f4e7e4; }
+        .friday { background-color: #e4f4f3; }
     </style>
 </head>
 <body>
     <div id="app">
         <div v-if="menuVisible">
-                <button @click="showFileUpload = true; menuVisible = false; ">Upload Files</button>
-                <button @click="generateSchedule();">Create Schedule</button>
+            <button @click="showFileUpload = true; menuVisible = false; ">Upload Files</button>
+            <button @click="generateSchedule();">Create Schedule</button>
         </div>
         <div v-if="showFileUpload">
             <input type="file" @change="handleFiles" multiple>
@@ -48,19 +69,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="day in days">
-                        <td>{{ day }}</td>
+                    <tr v-for="day in days" :class="day.toLowerCase()">
+                        <td class="vertical-text">{{ day }}</td>
                         <td><ul v-for="time in times">
-                            <li align="center"> {{time}} </li>
+                            <li> {{time}} </li>
                         </ul></td>
                         <td v-for="(year,index) in 4" :key="`class-${year}`">
-                            <table>
-                                <tr v-for="time in times" :key="`time-${time}`" >
-                                    <td align="center"> 
-                                        {{ getCourse(day, time, year) }}
-                                    </td>
-                                </tr>
-                            </table>
+                            <ul>
+                                <li v-for="time in times" :key="`time-${time}`">
+                                    {{ getCourse(day, time, year) }}
+                                </li>
+                            </ul>
                         </td>
                     </tr>
                 </tbody>
