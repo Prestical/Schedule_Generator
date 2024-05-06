@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="main.js" defer></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse; 
+            table-layout:unset; 
+        }
+        
+        th, td {
+            border: 0.5px solid rgba(100,100,100,0.5); 
+            padding: 13px; 
+        }
+        ul{
+            list-style-type: none;
+            border: 0.5px solid rgba(100,100,100,0.5);
+            padding: 5.3px; 
+        }
+        th {
+            background-color: #f4f4f8; 
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div v-if="menuVisible">
+                <button @click="showFileUpload = true; menuVisible = false; ">Upload Files</button>
+                <button @click="generateSchedule();">Create Schedule</button>
+        </div>
+        <div v-if="showFileUpload">
+            <input type="file" @change="handleFiles" multiple>
+            <button @click="showFileUpload = false; menuVisible = true;">Back</button>
+        </div>
+        <div v-if="showSchedule">
+            <button @click="showSchedule = false; menuVisible = true;">Back</button> <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>DAY</th>
+                        <th>Time</th>
+                        <th v-for="year in 4">Year {{ year }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="day in days">
+                        <td>{{ day }}</td>
+                        <td><ul v-for="time in times">
+                            <li align="center"> {{time}} </li>
+                        </ul></td>
+                        <td v-for="(year,index) in 4" :key="`class-${year}`">
+                            <table>
+                                <tr v-for="time in times" :key="`time-${time}`" >
+                                    <td align="center"> 
+                                        {{ getCourse(day, time, year) }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
