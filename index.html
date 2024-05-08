@@ -26,8 +26,8 @@
         </div>
         
         <div v-if="currentView === 'upload'">
+            <button @click="toggleView('menu')">Back</button> <br>
             <input type="file" @change="handleFiles" multiple>
-            <button @click="toggleView('menu')">Back</button>
         </div>
         <div v-if="currentView === 'schedule'">
             <button @click="toggleView('menu')">Back</button> <br>
