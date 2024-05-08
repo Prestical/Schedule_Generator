@@ -6,60 +6,31 @@
     <title>Schedule</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="main.js" defer></script>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse; 
-        }
-        th, td {
-            border: 1px solid #333; 
-            text-align: center;
-            padding: 0; 
-            margin: 0;
-        }
-        ul {
-            
-            list-style-type: none; 
-            margin: 0; 
-            padding: 0; 
-            width: 100%;
-            height: 100%; 
-            border: none; 
-        }
-        li {
-            border: 1px solid #000;
-            margin: 0; 
-            padding: 10px; 
-            width: auto; 
-        }
-        th {
-            background-color: #f4f4f8;
-        }
-        .vertical-text {
-            writing-mode: vertical-lr;
-            transform: rotate(180deg); 
-            white-space: nowrap; 
-        }
-        
-        .monday { background-color: #e7f4e4; }
-        .tuesday { background-color: #e4e7f4; }
-        .wednesday { background-color: #f4e7f4; }
-        .thursday { background-color: #f4e7e4; }
-        .friday { background-color: #e4f4f3; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="app">
-        <div v-if="menuVisible">
-            <button @click="showFileUpload = true; menuVisible = false; ">Upload Files</button>
-            <button @click="generateSchedule();">Create Schedule</button>
+        <div v-if="currentView === 'menu'">
+            <div class="toolbar">
+                <button @click="toggleView('upload')">Upload Files</button>
+                <button @click="generateSchedule">Create Schedule</button>
+                <div v-for="(section, index) in sections" class="dropdown" :key="section.dataSet">
+                    <button class="dropbtn">{{ section.title }}</button>
+                    <div class="dropdown-content">
+                        <a href="#" @click="modalData=section.dataSet; add()">Add</a>
+                        <a href="#" @click="modalData=section.dataSet; edit()">Edit</a>
+                        <a href="#" @click="modalData=section.dataSet; remove()">Delete</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div v-if="showFileUpload">
+        
+        <div v-if="currentView === 'upload'">
             <input type="file" @change="handleFiles" multiple>
-            <button @click="showFileUpload = false; menuVisible = true;">Back</button>
+            <button @click="toggleView('menu')">Back</button>
         </div>
-        <div v-if="showSchedule">
-            <button @click="showSchedule = false; menuVisible = true;">Back</button> <br>
+        <div v-if="currentView === 'schedule'">
+            <button @click="toggleView('menu')">Back</button> <br>
             <table>
                 <thead>
                     <tr>

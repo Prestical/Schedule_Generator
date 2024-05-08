@@ -1,9 +1,7 @@
 const app = Vue.createApp({
     data(){
-        return{
-            menuVisible :true ,
-            showFileUpload:false,
-            showSchedule:false,
+        return {
+            currentView: 'menu', //starts the page with menu
             defaultFiles:true,
             files: {},
             schedule: null,
@@ -12,23 +10,36 @@ const app = Vue.createApp({
             serviceCourses: [],
             classrooms: [],
             days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30"]
+            times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30"],
+            modalData: null, 
+            sections: [//elements of toolbar 
+                { title: 'Courses', dataSet: this.courses },
+                { title: 'Busy Times', dataSet: this.busyTimes },
+                { title: 'Service Courses', dataSet: this.serviceCourses },
+                { title: 'Classrooms', dataSet: this.classrooms }
+            ]
         };
     },
-    created(){
+    created(){//this part is processed, when app.js is loaded
         this.loadDefaultFiles();
     },
-    methods:{
+    methods: {
+        toggleView(view) {
+            this.currentView = view;
+        },
+        add() {//add new information
+        },
+        delete() {
+        },
+        edit() {
+        },
         getCourse(day,timeSlot,year){
             const timeIndex=this.times.indexOf(timeSlot)
             courseInfo=this.schedule[day][timeIndex].courses[year-1]
             return courseInfo[0]==null?"-":courseInfo[0]+" "+courseInfo[1]+" "+courseInfo[2];
         },
         handleFiles(event){
-            courses= [];
-            busyTimes= [];
-            serviceCourses= [];
-            classrooms= [];
+            courses = busyTimes = serviceCourses = classrooms= []; //reset the dataSets for for user files
             const files=event.target.files;
             Array.from(files).forEach(file => {
                 const reader=new FileReader();
@@ -56,7 +67,6 @@ const app = Vue.createApp({
                 fetch('/src/service.csv').then(res => res.text()),
                 fetch('/src/classroom.csv').then(res => res.text())
             ]);
-            // Verileri parse edip ilgili state'lere ata
             this.courses = this.parseCourses(responses[0]);
             this.busyTimes = this.parseBusy(responses[1]);
             this.serviceCourses = this.parseService(responses[2]);
@@ -152,14 +162,10 @@ const app = Vue.createApp({
             return result;
         },
         generateSchedule() {
-            if(this.defaultFiles){
-                this.loadDefaultFiles();
-            }
-            this.menuVisible = false;
             this.schedule=this.createTimeSchedule();
             this.placeCourses(this.schedule,this.courses,this.busyTimes,this.serviceCourses,this.classrooms);
             //this.displaySchedule();
-            this.showSchedule=true;
+            this.currentView = 'schedule';
         },
         getSuitableClassroom(studentNum,timeSlots,day){
             apClass=null;
@@ -189,8 +195,8 @@ const app = Vue.createApp({
         placeCourses() {
             this.placeServiceCourses();
             const serviceCodes=this.serviceCourses.map(service=> service.name)
-            this.courses=this.courses.filter(course=> !serviceCodes.includes(course.code))//removes service courses from main course program
             this.courses.forEach(course =>{
+                if(!serviceCodes.includes(course.code)){
                     let preference =course.hourPreference
                     if(preference==='3')
                     this.placeBlockCourse(course,3)
@@ -198,6 +204,7 @@ const app = Vue.createApp({
                         day=this.placeBlockCourse(course,2)
                         this.placeSingleCourse(course,day)
                     }
+                }
             })
         },
         placeServiceCourses(){
