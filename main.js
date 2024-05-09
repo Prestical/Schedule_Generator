@@ -2,7 +2,6 @@ const app = Vue.createApp({
     data(){
         return {
             currentView: 'menu', //starts the page with menu
-            defaultFiles:true,
             files: {},
             schedule: null,
             courses: [],
@@ -11,12 +10,13 @@ const app = Vue.createApp({
             classrooms: [],
             days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30"],
-            modalData: null, 
+            modalData: null,
+            modalType:null,
             sections: [//elements of toolbar 
-                { title: 'Courses', dataSet: this.courses },
-                { title: 'Busy Times', dataSet: this.busyTimes },
-                { title: 'Service Courses', dataSet: this.serviceCourses },
-                { title: 'Classrooms', dataSet: this.classrooms }
+                { title: 'Courses', dataSet: this.courses ,type: 'course'},
+                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busyTime'},
+                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'serviceCourse'},
+                { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
             ]
         };
     },
@@ -24,14 +24,47 @@ const app = Vue.createApp({
         this.loadDefaultFiles();
     },
     methods: {
+        assignSections(){
+            this.sections= [//elements of toolbar 
+                { title: 'Courses', dataSet: this.courses ,type: 'course'},
+                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busyTime'},
+                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'serviceCourse'},
+                { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
+            ]
+        },
+        triggerFileInput() {
+            this.$refs.fileInput.click();
+        },
+        dragOver(event) {
+            event.preventDefault();
+        },
+        dragLeave(event) {
+            event.preventDefault();
+        },
+        handleDrop(event) {
+            const files = Array.from(event.dataTransfer.files);
+            const csvFiles = files.filter(file => file.name.endsWith('.csv'));
+            
+            if (csvFiles.length > 0) {
+                this.handleFiles({ target: { files: csvFiles } });
+            } else {
+                alert('Please only drop CSV extension files');
+            }
+        },
         toggleView(view) {
             this.currentView = view;
         },
         add() {//add new information
-        },
-        delete() {
+            console.log(this.modalData)//keeps the data of selected option e.g courses, busyTimes etc
+            if(this.modalType==='course'){//adding operation for courses and modelData keeps the "courses" list
+
+                //do some changing over list and save it to the related file
+            }//and operations for others
         },
         edit() {
+        },
+        remove(){
+
         },
         getCourse(day,timeSlot,year){
             const timeIndex=this.times.indexOf(timeSlot)
@@ -58,7 +91,7 @@ const app = Vue.createApp({
                 };
                 reader.readAsText(file);
             })
-            this.defaultFiles=false;
+            this.assignSections();
         },
         async loadDefaultFiles() {
             const responses = await Promise.all([
@@ -71,24 +104,8 @@ const app = Vue.createApp({
             this.busyTimes = this.parseBusy(responses[1]);
             this.serviceCourses = this.parseService(responses[2]);
             this.classrooms = this.parseClassrooms(responses[3]);
+            this.assignSections();
         },
-        /*displaySchedule() {
-            var sc=""
-            console.log("Schedule:\n         |       Year 1      |       Year 2      |       Year 3      |       Year 4       ");
-            this.days.forEach(day => {
-                console.log(day);
-                this.schedule[day].forEach(slot => {
-                    const formatTime = time => `${time.split(':')[0].padStart(2, '0')}:${time.split(':')[1]}`;
-                    let line = `${formatTime(slot.time)} | `;
-                    slot.courses.forEach(course => {
-                        line += `${course[1] ? course[0]+" "+course[1]+" "+course[2] : '                   '}  `;
-                    });
-                    sc=sc+line+"\n";
-                    console.log(line);
-                });
-            });
-            return sc;
-        },*/
         createTimeSchedule() {
             const schedule = {};
             this.days.forEach(day => {
@@ -288,6 +305,23 @@ const app = Vue.createApp({
                     return false//return false if any element of time appears in the busyTime list
             }
             return true
-        }
+        },
+        /*displaySchedule() {//to display the schedule on console
+            var sc=""
+            console.log("Schedule:\n         |       Year 1      |       Year 2      |       Year 3      |       Year 4       ");
+            this.days.forEach(day => {
+                console.log(day);
+                this.schedule[day].forEach(slot => {
+                    const formatTime = time => `${time.split(':')[0].padStart(2, '0')}:${time.split(':')[1]}`;
+                    let line = `${formatTime(slot.time)} | `;
+                    slot.courses.forEach(course => {
+                        line += `${course[1] ? course[0]+" "+course[1]+" "+course[2] : '                   '}  `;
+                    });
+                    sc=sc+line+"\n";
+                    console.log(line);
+                });
+            });
+            return sc;
+        }*/
     }
 }).mount('#app');

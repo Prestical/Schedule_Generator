@@ -10,27 +10,34 @@
 </head>
 <body>
     <div id="app">
-        <div v-if="currentView === 'menu'">
             <div class="toolbar">
                 <button @click="toggleView('upload')">Upload Files</button>
                 <button @click="generateSchedule">Create Schedule</button>
-                <div v-for="(section, index) in sections" class="dropdown" :key="section.dataSet">
+                <div @change="loadDefaultFiles" v-for="(section, index) in sections" class="dropdown" :key="section.dataSet">
                     <button class="dropbtn">{{ section.title }}</button>
-                    <div class="dropdown-content">
-                        <a href="#" @click="modalData=section.dataSet; add()">Add</a>
-                        <a href="#" @click="modalData=section.dataSet; edit()">Edit</a>
-                        <a href="#" @click="modalData=section.dataSet; remove()">Delete</a>
+                    <div class="dropdown-content" >
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; add(); toggleView('add')">Add</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; edit(); toggleView('edit')">Edit</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; remove(); toggleView('remove')">Remove</a>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div v-if="currentView === 'upload'">
-            <input type="file" @change="handleFiles" multiple>
-            <button @click="toggleView('menu')">Back</button>
-        </div>
+            <div v-if="currentView === 'remove' || currentView === 'edit'||currentView === 'add'">
+                <button @click="currentView= 'menu'" > SAVE</button>
+            </div>
+            <!-- file uploading section -->
+            <div v-if="currentView === 'upload'">
+                <div class="drag-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="handleDrop" @click="triggerFileInput">
+                    <div class="icon">
+                        <img src="src/csvIcon.png" alt="csv icon" style="width: 50px;">
+                    </div>
+                    <h6> Drag & Drop Your Files <br> or Browse Files</h6>
+                    <span> Supported Format: csv </span>
+                    <input type="file" ref="fileInput"  @change="handleFiles"  accept=".csv"  multiple  hidden>
+                </div>
+            </div>
+            <!-- schedule section -->
         <div v-if="currentView === 'schedule'">
-            <button @click="toggleView('menu')">Back</button> <br>
             <table>
                 <thead>
                     <tr>
@@ -40,12 +47,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="day in days" :class="day.toLowerCase()">
+                    <tr v-for="day in days" :key="day" :class="day.toLowerCase()">
                         <td class="vertical-text">{{ day }}</td>
-                        <td><ul v-for="time in times">
-                            <li> {{time}} </li>
-                        </ul></td>
-                        <td v-for="(year,index) in 4" :key="`class-${year}`">
+                        <td>
+                            <ul>
+                                <li v-for="time in times" :key="time">{{ time }}</li>
+                            </ul>
+                        </td>
+                        <td v-for="year in 4" :key="`class-${year}`">
                             <ul>
                                 <li v-for="time in times" :key="`time-${time}`">
                                     {{ getCourse(day, time, year) }}
@@ -55,6 +64,10 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <!-- add,delete,edit operations section -->
+        <div v-if="currentView==='add' && modalType==='course'">
+            
         </div>
     </div>
 </body>
