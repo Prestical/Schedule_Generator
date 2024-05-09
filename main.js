@@ -2,6 +2,7 @@ const app = Vue.createApp({
     data(){
         return {
             currentView: 'menu', //starts the page with menu
+            formData: {},
             files: {},
             schedule: null,
             courses: [],
@@ -11,7 +12,7 @@ const app = Vue.createApp({
             days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30"],
             modalData: null,
-            modalType:null,
+            modalType: null,
             sections: [//elements of toolbar 
                 { title: 'Courses', dataSet: this.courses ,type: 'course'},
                 { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busyTime'},
@@ -54,17 +55,22 @@ const app = Vue.createApp({
         toggleView(view) {
             this.currentView = view;
         },
+        handleSubmit() {
+            console.log('Form submitted:', this.formData); // Show what submitted from form
+        },
         add() {//add new information
             console.log(this.modalData)//keeps the data of selected option e.g courses, busyTimes etc
             if(this.modalType==='course'){//adding operation for courses and modelData keeps the "courses" list
 
                 //do some changing over list and save it to the related file
             }//and operations for others
+            this.formData = {};
         },
         edit() {
+            console.log(this.modalData);
         },
         remove(){
-
+            console.log(this.modalData);
         },
         getCourse(day,timeSlot,year){
             const timeIndex=this.times.indexOf(timeSlot)

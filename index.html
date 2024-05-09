@@ -66,7 +66,22 @@
             </table>
         </div>
         <!-- add,delete,edit operations section -->
-        <div v-if="currentView==='add' && modalType==='course'">
+        <div v-if=currentView==='add'> <!-- When we open add/remove/edit option it will show that csv file attribute-->
+            <h3> Add an element to {{modalType.toUpperCase()}} </h3>
+            <form @submit.prevent="handleSubmit">
+                <div v-for="key in Object.keys(modalData[0])">
+                    <label>{{ key.toUpperCase() }}: </label>
+                    <input :id="key" v-model="formData[key]" :required="true"><br>
+                </div>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <div v-if=currentView==='remove'> 
+            <h3> Remove an element in {{modalType.toUpperCase()}} </h3>
+            
+        </div>
+        <div v-if=currentView==='edit'> 
+            <h3> Edit an element in {{modalType.toUpperCase()}} </h3>
             
         </div>
     </div>
