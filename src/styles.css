@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Lato", sans-serif;
 }
 body{
     background-image: url('img/background.png');
@@ -60,19 +60,22 @@ th {
     width: auto;
     background-color: #285f83;
     color: rgba(109, 136, 136, 0.548);
-    padding: 10px 20px;
+    padding: 6px 20px;
     display: flex;
-    justify-content: start;
+    justify-content: space-between; 
+    align-items: center;
 }
 
 .toolbar button, .dropbtn {
     color: rgb(255, 255, 255);
     background: none;
     border: none;
-    padding: 8px 16px;
-    font-size: 16px;
+    padding: 5px 30px;
+    font-size: 20px;
     cursor: pointer;
     transition: background-color 0.3s;
+    width: calc(100% / 6); 
+    box-sizing: border-box; 
 }
 
 .toolbar button:hover, .dropbtn:hover {
@@ -141,4 +144,70 @@ th {
     color: #fff;
     margin-top: 10px;
     text-align: center;
+}
+button {
+    border: none;
+    background-color: #285f83;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    margin: 20px 30px;
+}
+.removeContainer , .addContainer {
+    margin: 20px 30px;
+    font-size: 30px;
+}
+select {
+    width: 300px; 
+    height: 50px; 
+    border: none;
+    font-size: 20px;
+    
+}
+#saveBtn {
+    width: 500px;
+}
+#removeUl {
+    list-style-type: none; 
+    margin: 0; 
+    padding: 0; 
+    width: 60%;
+    height: 50%;
+    border: none; 
+    overflow-y: auto;
+    font-size: 20px;
+}
+#removeUl li {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 0; 
+    padding: 0; 
+    text-align: center;
+    width: 50%; 
+    height: 3%;
+}
+#removeH {
+    margin-top: 50px;
+    font-size: 30px;
+}
+.custom-label {
+    font-size: 20px;
+    margin: 15px 10px;
+
+}
+.custom-input {
+    width: 200px;
+    height: 25px;
+    border: none;
+    outline: none;
+    
+}
+#addInput {
+    border: none;
+    background-color: #285f83;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 20px;
+    margin-top: 30px;
 }
