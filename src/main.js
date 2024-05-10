@@ -1,9 +1,10 @@
 const app = Vue.createApp({
+    
     data(){
         return {
             currentView: 'menu', //starts the page with menu
             formData: {},
-            selectedobject: "",
+            selectedObject: "",
             files: {},
             schedule: null,
             courses: [],
@@ -19,7 +20,8 @@ const app = Vue.createApp({
                 { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busyTime'},
                 { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'serviceCourse'},
                 { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
-            ]
+            ],
+            removedCourses: []
         };
     },
     created(){//this part is processed, when app.js is loaded
@@ -102,14 +104,18 @@ const app = Vue.createApp({
             console.log(this.modalData);
         },
         remove(){
-            // Removes selected element in array // SOME BUGS IN IT I WILL CHANGE IT. 
-            console.log(this.modalData);
-            this.modalData = this.modalData.filter(item => {
-                return item !== this.selectedObject;
-            });
-            this.selectedObject = '';
-            console.log(this.modalData);
-            // Cant send array to csv file
+            if(this.selectedObject){
+                // Removes selected element in array
+                console.log(this.modalData);
+                this.modalData = this.modalData.filter(item => {
+                    return item !== this.selectedObject;
+                });
+                this.removedCourses.push(this.selectedObject); // Kaldırılan dersi removedCourses dizisine ekle
+                this.selectedObject = ""; // selectedObject'i sıfırla
+                console.log(this.modalData);
+                // Cant send array to csv file
+                // Router olayından dolayı sadece courses kısmında düzgünce listeleme yapıyor. 
+            }
         },
         getCourse(day,timeSlot,year){
             const timeIndex=this.getTimeIndex(timeSlot)
