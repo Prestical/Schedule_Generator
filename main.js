@@ -3,6 +3,7 @@ const app = Vue.createApp({
         return {
             currentView: 'menu', //starts the page with menu
             formData: {},
+            selectedobject: "",
             files: {},
             schedule: null,
             courses: [],
@@ -59,18 +60,56 @@ const app = Vue.createApp({
             console.log('Form submitted:', this.formData); // Show what submitted from form
         },
         add() {//add new information
-            console.log(this.modalData)//keeps the data of selected option e.g courses, busyTimes etc
-            if(this.modalType==='course'){//adding operation for courses and modelData keeps the "courses" list
-
-                //do some changing over list and save it to the related file
-            }//and operations for others
+            console.log(this.modalData);
+            if(Object.keys(this.formData).length > 0){
+                if (this.modalType === 'course') {
+                    this.courses.push({
+                        code: this.formData.code.trim(),
+                        name: this.formData.name.trim(),
+                        year: this.formData.year.trim(),
+                        credit: this.formData.credit.trim(),
+                        type: this.formData.type.trim(),
+                        department: this.formData.department.trim(),
+                        students: Number(this.formData.students.trim()),
+                        instructor: this.formData.instructor.trim(),
+                        hourPreference: this.formData.hourPreference.trim()
+                    });
+                } else if (this.modalType === 'busyTime') {
+                    this.busyTimes.push({
+                        name: this.formData.name.trim(),
+                        day: this.formData.day.trim(),
+                        times: this.formData.times.trim().split(',').map(time => time.trim())
+                    });
+                } else if (this.modalType === 'serviceCourse') {
+                    this.serviceCourses.push({
+                        name: this.formData.name.trim(),
+                        day: this.formData.day.trim(),
+                        timeSlots: this.formData.timeSlots.trim().split(',').map(time => time.trim())
+                    });
+                } else if (this.modalType === 'classroom') {
+                    this.classrooms.push({
+                        name: this.formData.name.trim(),
+                        capacity: Number(this.formData.capacity.trim())
+                    });
+                }
+                // Cant send array to csv file
+            }
             this.formData = {};
+            this.assignSections();
+            console.log(this.modalData);
         },
         edit() {
             console.log(this.modalData);
         },
         remove(){
+            // Removes selected element in array // SOME BUGS IN IT I WILL CHANGE IT. 
             console.log(this.modalData);
+            this.modalData = this.modalData.filter(item => {
+                return item !== this.selectedObject;
+            });
+            this.selectedObject = '';
+            console.log(this.modalData);
+            // Cant send array to csv file
         },
         getCourse(day,timeSlot,year){
             const timeIndex=this.times.indexOf(timeSlot)

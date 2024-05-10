@@ -16,7 +16,7 @@
                 <div @change="loadDefaultFiles" v-for="(section, index) in sections" class="dropdown" :key="section.dataSet">
                     <button class="dropbtn">{{ section.title }}</button>
                     <div class="dropdown-content" >
-                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; add(); toggleView('add')">Add</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; add();toggleView('add')">Add</a>
                         <a href="#" @click=" modalData=section.dataSet; modalType=section.type; edit(); toggleView('edit')">Edit</a>
                         <a href="#" @click=" modalData=section.dataSet; modalType=section.type; remove(); toggleView('remove')">Remove</a>
                     </div>
@@ -68,7 +68,8 @@
         <!-- add,delete,edit operations section -->
         <div v-if=currentView==='add'> <!-- When we open add/remove/edit option it will show that csv file attribute-->
             <h3> Add an element to {{modalType.toUpperCase()}} </h3>
-            <form @submit.prevent="handleSubmit">
+            <p>  Example Input : <em>{{Object.values(modalData[0])}}</em> </p>
+            <form id="addForm" @submit.prevent="handleSubmit">
                 <div v-for="key in Object.keys(modalData[0])">
                     <label>{{ key.toUpperCase() }}: </label>
                     <input :id="key" v-model="formData[key]" :required="true"><br>
@@ -78,11 +79,15 @@
         </div>
         <div v-if=currentView==='remove'> 
             <h3> Remove an element in {{modalType.toUpperCase()}} </h3>
-            
-        </div>
-        <div v-if=currentView==='edit'> 
-            <h3> Edit an element in {{modalType.toUpperCase()}} </h3>
-            
+                
+            <div>
+                <p>Selected Object: {{ selectedObject }}</p>
+                <select v-model="selectedObject">
+                    <option disabled value="">Please select</option>
+                    <option v-for="object in modalData" :key="object.code" :value="object">{{ object.name }}</option>
+                </select>
+                <button @click="remove">Remove</button>
+            </div>
         </div>
     </div>
 </body>
