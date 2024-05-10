@@ -112,26 +112,28 @@ const app = Vue.createApp({
             // Cant send array to csv file
         },
         getCourse(day,timeSlot,year){
-            const timeIndex=this.times.indexOf(timeSlot)
+            const timeIndex=this.getTimeIndex(timeSlot)
             courseInfo=this.schedule[day][timeIndex].courses[year-1]
-            return courseInfo[0]==null?"-":courseInfo[0]+" "+courseInfo[1]+" "+courseInfo[2];
+            return courseInfo[0]==null?"-":courseInfo[0]+" "+courseInfo[1];
         },
         handleFiles(event){
-            courses = busyTimes = serviceCourses = classrooms= []; //reset the dataSets for for user files
             const files=event.target.files;
             Array.from(files).forEach(file => {
                 const reader=new FileReader();
                 reader.onload = e =>{
                     this.files[file.name]=e.target.result;
-                    if(file.name==='Courses.csv'){
-                        this.courses=this.parseCourses(e.target.result);
-                    }
-                    else if (file.name === 'busy.csv') {
-                        this.busyTimes = this.parseBusy(e.target.result);
-                    } else if (file.name === 'service.csv') {
-                        this.serviceCourses = this.parseService(e.target.result);
-                    } else if (file.name === 'classroom.csv') {
-                        this.classrooms = this.parseClassrooms(e.target.result);
+                    try {
+                        if(file.name==='Courses.csv'){
+                            this.courses=this.parseCourses(e.target.result);
+                        } else if (file.name === 'busy.csv') {
+                            this.busyTimes = this.parseBusy(e.target.result);
+                        } else if (file.name === 'service.csv') {
+                            this.serviceCourses = this.parseService(e.target.result);
+                        } else if (file.name === 'classroom.csv') {
+                            this.classrooms = this.parseClassrooms(e.target.result);
+                        }
+                    } catch (parseError) {
+                        alert(`Error parsing ${file.name}: ${parseError.message}`);
                     }
                 };
                 reader.readAsText(file);
@@ -139,26 +141,31 @@ const app = Vue.createApp({
             this.assignSections();
         },
         async loadDefaultFiles() {
-            const responses = await Promise.all([
-                fetch('/src/Courses.csv').then(res => res.text()),
-                fetch('/src/busy.csv').then(res => res.text()),
-                fetch('/src/service.csv').then(res => res.text()),
-                fetch('/src/classroom.csv').then(res => res.text())
-            ]);
-            this.courses = this.parseCourses(responses[0]);
-            this.busyTimes = this.parseBusy(responses[1]);
-            this.serviceCourses = this.parseService(responses[2]);
-            this.classrooms = this.parseClassrooms(responses[3]);
-            this.assignSections();
+            try {
+                const responses = await Promise.all([
+                    fetch('data/Courses.csv').then(res => res.text()),
+                    fetch('data/busy.csv').then(res => res.text()),
+                    fetch('data/service.csv').then(res => res.text()),
+                    fetch('data/classroom.csv').then(res => res.text())
+                ]);
+                this.courses = this.parseCourses(responses[0]);
+                this.busyTimes = this.parseBusy(responses[1]);
+                this.serviceCourses = this.parseService(responses[2]);
+                this.classrooms = this.parseClassrooms(responses[3]);
+                this.assignSections();
+            } catch (error) {
+                console.error('Failed to load default files:', error);
+                alert('Failed to load one or more default files. Please check the console for more details.');
+            }
         },
         createTimeSchedule() {
             const schedule = {};
             this.days.forEach(day => {
                 schedule[day] = this.times.map(time => ({ 
                     time: time, 
-                    courses: Array(4).fill(Array(3).fill(null))}));//each row keeps different year and each column keeps course code class and instructor info.
+                    courses: Array(4).fill(Array(2).fill(null))}));//each row keeps different year and each column keeps course code and class
             });
-            return schedule;
+            this.schedule = schedule;
         },
         parseCourses(content){
             const result=[];
@@ -176,7 +183,7 @@ const app = Vue.createApp({
                     department:parts[5].trim(),
                     students:Number(parts[6].trim()),
                     instructor:parts[7].trim(),
-                    hourPreference:parts[8].trim()
+                    hourPreference:parts[8].trim().split('+').map(num => Number(num))
                   })
             })
             return result;
@@ -202,7 +209,7 @@ const app = Vue.createApp({
                     const parts = line.split(',');
                     const times = parts.slice(2).map(time => time.replace(/"/g,'').trim());
                         result.push({
-                            name: parts[0].trim(),
+                            code: parts[0].trim(),
                             day: parts[1].trim(),
                             timeSlots: times.map(time => time.trim())
                         });
@@ -224,10 +231,11 @@ const app = Vue.createApp({
             return result;
         },
         generateSchedule() {
-            this.schedule=this.createTimeSchedule();
-            this.placeCourses(this.schedule,this.courses,this.busyTimes,this.serviceCourses,this.classrooms);
-            //this.displaySchedule();
-            this.currentView = 'schedule';
+            this.createTimeSchedule();
+            if(this.placeCourses()){
+                this.toggleView("schedule")
+            }
+            
         },
         getSuitableClassroom(studentNum,timeSlots,day){
             apClass=null;
@@ -249,77 +257,64 @@ const app = Vue.createApp({
                     classCapacity=classroom.capacity
                 }
             })
-            if(!apClass){//if apClass is null
-                //throw new Error("there is no suitable classroom")//there is no suitable classroom for courses
-            }
             return apClass;
+        },
+        getTimeIndex(hour){
+            return this.times.indexOf(hour);
         },
         placeCourses() {
             this.placeServiceCourses();
-            const serviceCodes=this.serviceCourses.map(service=> service.name)
-            this.courses.forEach(course =>{
+            const serviceCodes=this.serviceCourses.map(service=> service.code)
+            for(const course of this.courses){
                 if(!serviceCodes.includes(course.code)){
-                    let preference =course.hourPreference
-                    if(preference==='3')
-                    this.placeBlockCourse(course,3)
-                    else if(preference==='2+1'){
-                        day=this.placeBlockCourse(course,2)
-                        this.placeSingleCourse(course,day)
+                    if(!this.placeCourse(course)){
+                        return false;
                     }
                 }
-            })
+            }
+            return true;
         },
         placeServiceCourses(){
             this.serviceCourses.forEach(course=>{
-                courseInfo=this.courses.find(temp => temp.code === course.name)
+                courseInfo=this.courses.find(temp => temp.code === course.code)
                 classroom=this.getSuitableClassroom(courseInfo.students,course.timeSlots,course.day);
-                if(classroom!=null){
-                    this.courses=this.courses.filter(_course => _course.name !==course.name)
+                if(classroom!=null && this.isTimeSlotsAvaiable(course.day,course.timeSlots,courseInfo.year)){
                     course.timeSlots.forEach(timeSlot=>{
                         const timeIndex=this.times.indexOf(timeSlot)
-                        this.schedule[course.day][timeIndex].courses[courseInfo.year-1]=[course.name,classroom,courseInfo.instructor.split(' ').splice(-1)];
+                        this.schedule[course.day][timeIndex].courses[courseInfo.year-1]=[course.code,classroom];
                     }) 
                     
                 }
             })
         },
-        placeSingleCourse(course,excludedDay) {
-            const lastName = course.instructor.split(' ').splice(-1)
+        placeCourse(course,excludedDay="",block=null){
+            if(block==null){
+                block=course.hourPreference;
+            }
             for(const day of this.days){
-                if(day===excludedDay) continue//to place the single course hour to another day
-                for (let i = 0 ; i < this.times.length; ++i){
-                    const currentTimes = [this.times[i]];
-                    const busyTime = this.getBusyTime(course.instructor, day);
+                if(excludedDay===day) continue;
+                for( var i=0; i<=this.times.length-block[0]; i++){
+                    var currentTimes=this.times.slice(i,i+block[0]);
+                    const busyTime=this.getBusyTime(course.instructor,day);
                     if(this.isInstructorSuitable(currentTimes,busyTime)){
-                        const classroom = this.getSuitableClassroom(course.students,currentTimes,day);
+                        const classroom= this.getSuitableClassroom(course.students,currentTimes,day);
                         if(classroom!=null && this.isTimeSlotsAvaiable(day,currentTimes,course.year)){
-                            this.schedule[day][i].courses[course.year - 1] = [course.code, classroom, lastName];
-                            return day;
-                        }
-                    }
-                }
-            }
-            console.log('No success')//document.getElementId alertBox "there is no combination to create a proper schedule"
-        },
-        placeBlockCourse(course,block) {
-            const lastName = course.instructor.split(' ').splice(-1);
-            for (const day of this.days) {
-                for (let i = 0; i <= this.times.length - block; i++) { // Ensure there is room for a "3or 2"  hour block and find the available time block according to instructors' busy times ans classrooms
-                    const currentTimes = block==3?[this.times[i], this.times[i+1], this.times[i+2]]:[this.times[i], this.times[i+1]];//determines the block "3 or 2"
-                    const busyTime = this.getBusyTime(course.instructor, day);
-                    if(this.isInstructorSuitable(currentTimes,busyTime)){//detects intersections between times and busyTimes
-                        const classroom = this.getSuitableClassroom(course.students,currentTimes,day);
-                        if(classroom!=null && this.isTimeSlotsAvaiable(day,currentTimes,course.year)){
-                            for (let timeIndex = i; timeIndex < i + block; timeIndex++) {//places the block of courses
-                                this.schedule[day][timeIndex].courses[course.year - 1] = [course.code, classroom, lastName];
+                            currentTimes.forEach(hour=>{
+                                const timeIndex=this.getTimeIndex(hour);
+                                this.schedule[day][timeIndex].courses[course.year-1]=[course.code,classroom]
+                            })
+                            if(block.length>1){
+                                this.placeCourse(course,day,[block[1]])
                             }
-                            return day;
+                            return true;
                         }
                     }
-                    
                 }
             }
-            console.log('No success')//document.getElementId alertBox "there is no combination to create a proper schedule"
+            this.showSchedule=false;
+            console.log(course.code," ",block)
+            alert("no succes");
+            return false;
         },
         isTimeSlotsAvaiable(day,timeSlots,year){
             isAvailable=true;
