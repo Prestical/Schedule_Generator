@@ -70,4 +70,5 @@ function busyToCsv(busy){
 function classroomToCsv(classroom){
   const val=classroom.map(c=>Object.values(c));
   const csv=val.map(row => row.join(';')).join('\n');
+  return csv;
 }

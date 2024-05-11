@@ -22,6 +22,7 @@ const app = Vue.createApp({
                 { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
             ],
             removedCourses: [],
+            selectedTimes: [],
             editOption: "",
         };
     },
@@ -38,6 +39,15 @@ const app = Vue.createApp({
                 this.selectedCourse = null;
                 this.newCourseCode = "";
             }
+        }
+    },
+    computed: {
+        uniqueInstructors() {
+            const instructorSet = new Set();
+            this.sections[0].dataSet.forEach(object => {
+                instructorSet.add(object.instructor);
+            });
+            return Array.from(instructorSet);
         }
     },
     methods: {
@@ -75,6 +85,10 @@ const app = Vue.createApp({
             console.log('Form submitted:', this.formData); // Show what submitted from form
             this.add();
         },
+        addTime(time){
+            this.selectedTimes.push(time);
+            console.log(this.selectedTimes);
+        },
         add() {// There is an error in Add serviseCourse section
             console.log(this.modalData);
             if(Object.keys(this.formData).length > 0){
@@ -94,13 +108,13 @@ const app = Vue.createApp({
                     this.busyTimes.push({
                         name: this.formData.name.trim(),
                         day: this.formData.day.trim(),
-                        times: this.formData.times.trim().split(',').map(time => time.trim())
+                        times: this.selectedTimes // Normally it gets array but now null
                     });
                 } else if (this.modalType === 'service') {
                     this.serviceCourses.push({
                         name: this.formData.code.trim(),
                         day: this.formData.day.trim(),
-                        timeSlots: this.formData.timeSlots.trim().split(',').map(time => time.trim())
+                        timeSlots: this.selectedTimes // Normally it gets array but now null
                     });
                 } else if (this.modalType === 'classroom') {
                     this.classrooms.push({
@@ -109,6 +123,7 @@ const app = Vue.createApp({
                     });
                 }
             }
+            this.selectedTimes = [];
             this.formData = {};
             this.assignSections();
         },
@@ -160,14 +175,15 @@ const app = Vue.createApp({
                     this.courses = this.courses.filter(obj => obj.code !== this.selectedObject.code);
                     this.modalData = this.courses;
                 } else if (this.modalType === 'busy') {
-                    this.busyTimes = this.busyTimes.filter(obj => obj.name !== this.selectedObject.name);
-                    this.modalData = this.courses;
+                    // Solved the deleting duplicated names
+                    this.busyTimes = this.busyTimes.filter(obj => !(obj.times === this.selectedObject.times && obj.name === this.selectedObject.name));
+                    this.modalData = this.busyTimes;
                 } else if (this.modalType === 'service') {
                     this.serviceCourses = this.serviceCourses.filter(obj => obj.code !== this.selectedObject.code);
-                    this.modalData = this.courses;
+                    this.modalData = this.serviceCourses;
                 } else if (this.modalType === 'classroom') {
                     this.classrooms = this.classrooms.filter(obj => obj.name !== this.selectedObject.name);
-                    this.modalData = this.courses;
+                    this.modalData = this.classrooms;
                 }
                 this.removedCourses.push(this.selectedObject);
                 this.selectedObject = {};
