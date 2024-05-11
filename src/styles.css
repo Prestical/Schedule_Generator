@@ -11,7 +11,7 @@ body{
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat;  
-    height: 100vh; 
+    height: 100vh;
 }
 table {
     width: 60%;
@@ -67,7 +67,7 @@ th {
     width: auto;
     background-color: #285f83;
     color: rgba(109, 136, 136, 0.548);
-    padding: 6px 20px;
+    padding: 6px 25px;
     display: flex;
     justify-content: space-between; 
     align-items: center;
@@ -81,7 +81,6 @@ th {
     font-size: 20px;
     cursor: pointer;
     transition: background-color 0.3s;
-    width: calc(100% / 6); 
     box-sizing: border-box; 
 }
 
@@ -103,7 +102,9 @@ th {
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     transition: background-color 0.3s, color 0.3s, cursor 0.3s;
-    
+    left: 50%;
+    transform: translateX(-50%); 
+    top: 100%; 
 }
 
 .dropdown-content a {
@@ -129,7 +130,11 @@ th {
     display: block;
 }
 .drag-area {
-    margin: 20px 20px;
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    margin: 0;
     border: 2px dashed #fff;
     height: 250px;
     width: 350px;
