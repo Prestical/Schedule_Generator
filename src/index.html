@@ -16,9 +16,9 @@
                 <div @change="loadDefaultFiles" v-for="(section, index) in sections" class="dropdown" :key="section.dataSet">
                     <button class="dropbtn">{{ section.title.toUpperCase() }}</button>
                     <div class="dropdown-content" >
-                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; add();toggleView('add')">Add</a>
-                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; edit(); toggleView('edit')">Edit</a>
-                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; remove(); toggleView('remove')">Remove</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; add();toggleView('add')">ADD</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; edit(); toggleView('edit')">EDIT</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; remove(); toggleView('remove')">REMOVE</a>
                     </div>
                 </div>
             </div>
@@ -26,7 +26,7 @@
             <div v-if="currentView === 'upload'">
                 <div class="drag-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="handleDrop" @click="triggerFileInput">
                     <div class="icon">
-                        <img src="img/csvIcon.png" alt="csv icon" style="width: 50px;">
+                        <img src="img/csvIcon.png" alt="csv icon" style="width: 75px;">
                     </div>
                     <h6> Drag & Drop Your Files <br> or Browse Files</h6>
                     <span> Supported Format: csv </span>
@@ -34,7 +34,7 @@
                 </div>
             </div>
             <!-- schedule section -->
-        <div v-if="currentView === 'schedule'">
+        <div class="scheduleContainer" v-if="currentView === 'schedule'">
             <table>
                 <thead>
                     <tr>
@@ -45,7 +45,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="day in days" :key="day" :class="day.toLowerCase()">
-                        <td class="vertical-text">{{ day }}</td>
+                        <td class="vertical-text">{{ day.toUpperCase() }}</td>
                         <td>
                             <ul>
                                 <li v-for="time in times" :key="time">{{ time }}</li>
