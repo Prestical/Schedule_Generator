@@ -4,7 +4,7 @@ const app = Vue.createApp({
         return {
             currentView: 'menu', //starts the page with menu
             formData: {},
-            selectedObject: "",
+            selectedObject: {},
             files: {},
             schedule: null,
             courses: [],
@@ -22,17 +22,6 @@ const app = Vue.createApp({
                 { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
             ],
             removedCourses: [],
-            editOptions: [
-                { label: 'Code', value: 'code' },
-                { label: 'Name', value: 'name' },
-                { label: 'Year', value: 'year' },
-                { label: 'Credit', value: 'credit' },
-                { label: 'Type', value: 'type' },
-                { label: 'Department/Service', value: 'department' },
-                { label: 'Number of Students', value: 'students' },
-                { label: 'Instructor Name', value: 'instructor' },
-                { label: 'Course Hour Preference', value: 'hourPreference' }
-            ],
             editOption: "",
 
         };
@@ -86,7 +75,7 @@ const app = Vue.createApp({
         handleSubmit() {
             console.log('Form submitted:', this.formData); // Show what submitted from form
         },
-        add() {//add new information
+        add() {// There is an error in Add serviseCourse section
             console.log(this.modalData);
             if(Object.keys(this.formData).length > 0){
                 if (this.modalType === 'course') {
@@ -109,7 +98,7 @@ const app = Vue.createApp({
                     });
                 } else if (this.modalType === 'serviceCourse') {
                     this.serviceCourses.push({
-                        name: this.formData.name.trim(),
+                        name: this.formData.code.trim(),
                         day: this.formData.day.trim(),
                         timeSlots: this.formData.timeSlots.trim().split(',').map(time => time.trim())
                     });
@@ -123,9 +112,8 @@ const app = Vue.createApp({
             }
             this.formData = {};
             this.assignSections();
-            console.log(this.modalData);
         },
-        edit() {
+        edit() { // Cant save the changes to the specific array (it can show changes immediately in same page)
             switch (this.editOption) {
                 case 'code':
                     this.selectedCourse.code = this.newValue;
@@ -157,34 +145,37 @@ const app = Vue.createApp({
                 default:
                     break;
             }
-
             console.log(this.selectedObject); 
         
             this.newValue = ''; // Reset the input field
             this.editOption = ''; // Reset the edit option
+            this.selectedObject = {};
         },
         selectCourse(course) {
             // Seçilen dersi güncel seçilen ders olarak ayarla
             this.selectedCourse = course;
         },
-        remove(){
-            if(this.selectedObject){
-                // Removes selected element in array
-                console.log(this.modalData);
-                this.modalData = this.modalData.filter(item => {
-                    return item !== this.selectedObject;
-                });
-                this.removedCourses.push(this.selectedObject); // Kaldırılan dersi removedCourses dizisine ekle
-                this.selectedObject = ""; // selectedObject'i sıfırla
-                console.log(this.modalData);
-                // Cant send array to csv file
-                // Router olayından dolayı sadece courses kısmında düzgünce listeleme yapıyor. 
+        remove(){ // (it can not show changes immediately in same page) Also when we open different remove sections removedCourses show past deleteions
+            if (this.selectedObject){
+                if (this.modalType === 'course') {
+                    this.courses = this.courses.filter(obj => obj.code !== this.selectedObject.code);
+                } else if (this.modalType === 'busyTime') {
+                    this.busyTimes = this.busyTimes.filter(obj => obj.name !== this.selectedObject.name);
+                } else if (this.modalType === 'serviceCourse') {
+                    this.serviceCourses = this.serviceCourses.filter(obj => obj.code !== this.selectedObject.code);
+                } else if (this.modalType === 'classroom') {
+                    this.classrooms = this.classrooms.filter(obj => obj.name !== this.selectedObject.name);
+                }
+                this.removedCourses.push(this.selectedObject);
+                this.selectedObject = {};
+                this.assignSections();
             }
+           
         },
         getCourse(day,timeSlot,year){
             const timeIndex=this.getTimeIndex(timeSlot)
             courseInfo=this.schedule[day][timeIndex].courses[year-1]
-            return courseInfo[0]==null?"-":courseInfo[0]+" "+courseInfo[1];
+            return courseInfo[0]==null?"&nbsp;":courseInfo[0]+" "+courseInfo[1];
         },
         handleFiles(event){
             const files=event.target.files;
