@@ -41,20 +41,27 @@ li {
     height: 3%;
 }
 th {
-    background-color: #acedfd;
+    background-color: #EEF7FF;
 }
 
 .vertical-text {
     writing-mode: vertical-lr;
     transform: rotate(180deg); 
-    white-space: nowrap; 
+    white-space: nowrap;
+    font-weight: 600; 
+}
+.scheduleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
 }
 
-.monday { background-color: #defad7; }
-.tuesday { background-color: #d1d7f5; }
-.wednesday { background-color: #f4e7f4; }
-.thursday { background-color: #fae1db; }
-.friday { background-color: #ddfcfa; }
+.monday { background-color: #FFBE98; }
+.tuesday { background-color: #FFEBB2; }
+.wednesday { background-color: #F3D0D7; }
+.thursday { background-color: #C0D6E8; }
+.friday { background-color: #C5EBAA; }
 
 .toolbar {
     width: auto;
@@ -88,29 +95,41 @@ th {
 }
 
 .dropdown-content {
+    border-radius: 20px;
     display: none;
     position: absolute;
     background-color: #f9f9f9;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
+    transition: background-color 0.3s, color 0.3s, cursor 0.3s;
+    
 }
 
 .dropdown-content a {
+    border-radius: 20px;
+    width: 300px;
+    height: 50px;
     color: black;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
 }
 
 .dropdown-content a:hover {
     background-color: #f1f1f1;
+    color: #285f83; 
+    cursor: pointer;
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
 }
 .drag-area {
+    margin: 20px 20px;
     border: 2px dashed #fff;
     height: 250px;
     width: 350px;
@@ -137,13 +156,15 @@ th {
     color: #fff;
     font-weight: 400;
     text-align: center;
+    font-size: 25px;
 }
 
 .drag-area span {
     font-size: 12px;
     color: #fff;
-    margin-top: 10px;
+    margin-top: 20px;
     text-align: center;
+    font-size: 20px;
 }
 button {
     border: none;
@@ -167,6 +188,7 @@ select {
 }
 #saveBtn {
     width: 500px;
+    cursor: pointer;
 }
 #removeUl {
     list-style-type: none; 
@@ -210,4 +232,5 @@ select {
     font-size: 16px;
     border-radius: 20px;
     margin-top: 30px;
+    cursor: pointer;
 }
