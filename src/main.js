@@ -184,7 +184,7 @@ const app = Vue.createApp({
         getCourse(day,timeSlot,year){
             const timeIndex=this.getTimeIndex(timeSlot)
             courseInfo=this.schedule[day][timeIndex].courses[year-1]
-            return courseInfo[0]==null?"-":courseInfo[0]+" "+courseInfo[1];
+            return courseInfo[0]==null?"&nbsp;":courseInfo[0]+" "+courseInfo[1];
         },
         handleFiles(event){
             const files=event.target.files;

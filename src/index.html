@@ -53,9 +53,7 @@
                         </td>
                         <td v-for="year in 4" :key="`class-${year}`">
                             <ul>
-                                <li v-for="time in times" :key="`time-${time}`">
-                                    {{ getCourse(day, time, year) }}
-                                </li>
+                                <li v-html="getCourse(day,time,year)" v-for="time in times" :key="`time-${time}`"></li>
                             </ul>
                         </td>
                     </tr>
