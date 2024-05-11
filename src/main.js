@@ -16,14 +16,13 @@ const app = Vue.createApp({
             modalData: null,
             modalType: null,
             sections: [//elements of toolbar 
-                { title: 'Courses', dataSet: this.courses ,type: 'course'},
-                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busyTime'},
-                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'serviceCourse'},
+                { title: 'Courses', dataSet: this.courses ,type: 'Courses'},
+                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busy'},
+                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'service'},
                 { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
             ],
             removedCourses: [],
             editOption: "",
-
         };
     },
     created(){//this part is processed, when app.js is loaded
@@ -44,9 +43,9 @@ const app = Vue.createApp({
     methods: {
         assignSections(){
             this.sections= [//elements of toolbar 
-                { title: 'Courses', dataSet: this.courses ,type: 'course'},
-                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busyTime'},
-                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'serviceCourse'},
+                { title: 'Courses', dataSet: this.courses ,type: 'Courses'},
+                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busy'},
+                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'service'},
                 { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
             ]
         },
@@ -74,11 +73,12 @@ const app = Vue.createApp({
         },
         handleSubmit() {
             console.log('Form submitted:', this.formData); // Show what submitted from form
+            this.add();
         },
         add() {// There is an error in Add serviseCourse section
             console.log(this.modalData);
             if(Object.keys(this.formData).length > 0){
-                if (this.modalType === 'course') {
+                if (this.modalType === 'Courses') {
                     this.courses.push({
                         code: this.formData.code.trim(),
                         name: this.formData.name.trim(),
@@ -90,13 +90,13 @@ const app = Vue.createApp({
                         instructor: this.formData.instructor.trim(),
                         hourPreference: this.formData.hourPreference.trim()
                     });
-                } else if (this.modalType === 'busyTime') {
+                } else if (this.modalType === 'busy') {
                     this.busyTimes.push({
                         name: this.formData.name.trim(),
                         day: this.formData.day.trim(),
                         times: this.formData.times.trim().split(',').map(time => time.trim())
                     });
-                } else if (this.modalType === 'serviceCourse') {
+                } else if (this.modalType === 'service') {
                     this.serviceCourses.push({
                         name: this.formData.code.trim(),
                         day: this.formData.day.trim(),
@@ -108,7 +108,6 @@ const app = Vue.createApp({
                         capacity: Number(this.formData.capacity.trim())
                     });
                 }
-                // Cant send array to csv file
             }
             this.formData = {};
             this.assignSections();
@@ -157,14 +156,18 @@ const app = Vue.createApp({
         },
         remove(){ // (it can not show changes immediately in same page) Also when we open different remove sections removedCourses show past deleteions
             if (this.selectedObject){
-                if (this.modalType === 'course') {
+                if (this.modalType === 'Courses') {
                     this.courses = this.courses.filter(obj => obj.code !== this.selectedObject.code);
-                } else if (this.modalType === 'busyTime') {
+                    this.modalData = this.courses;
+                } else if (this.modalType === 'busy') {
                     this.busyTimes = this.busyTimes.filter(obj => obj.name !== this.selectedObject.name);
-                } else if (this.modalType === 'serviceCourse') {
+                    this.modalData = this.courses;
+                } else if (this.modalType === 'service') {
                     this.serviceCourses = this.serviceCourses.filter(obj => obj.code !== this.selectedObject.code);
+                    this.modalData = this.courses;
                 } else if (this.modalType === 'classroom') {
                     this.classrooms = this.classrooms.filter(obj => obj.name !== this.selectedObject.name);
+                    this.modalData = this.courses;
                 }
                 this.removedCourses.push(this.selectedObject);
                 this.selectedObject = {};
@@ -219,6 +222,36 @@ const app = Vue.createApp({
                 alert('Failed to load one or more default files. Please check the console for more details.');
             }
         },
+        saveChanges(){
+            console.log(this.modalData)
+            this.updateFile(this.modalType+'.csv')
+        },
+        async updateFile(fileName) {
+            console.log('Updating file ' + fileName);
+            const content=this.modalData;
+            console.log(content)
+            switch (fileName) {
+                case "course":
+            }
+            try {
+                const response = await fetch('http://localhost:3030/update-data', {//you can change the port (3030), if required, dont forget to change the port in server.js as well
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fileName, content })
+                });
+        
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                
+                const responseData = await response.json();
+                console.log(responseData);  // Log the response data from the server
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
         createTimeSchedule() {
             const schedule = {};
             this.days.forEach(day => {
@@ -244,7 +277,7 @@ const app = Vue.createApp({
                     department:parts[5].trim(),
                     students:Number(parts[6].trim()),
                     instructor:parts[7].trim(),
-                    hourPreference:parts[8].trim().split('+').map(num => Number(num))
+                    hourPreference:parts[8]
                   })
             })
             return result;
@@ -350,7 +383,7 @@ const app = Vue.createApp({
         },
         placeCourse(course,excludedDay="",block=null){
             if(block==null){
-                block=course.hourPreference;
+                block=course.hourPreference.trim().split('+').map(num => Number(num));
             }
             for(const day of this.days){
                 if(excludedDay===day) continue;
