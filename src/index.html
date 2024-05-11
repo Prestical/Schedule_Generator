@@ -94,6 +94,43 @@
                 </ul>
             </div>
         </div>
+        <div v-if=currentView==="edit" class="editContainer"> 
+            <h3 id="editH"> Edit an element in {{modalType.toUpperCase()}} </h3>
+            <div>
+                <select v-model="selectedObject">
+                    <option disabled value="">Please select</option>
+                    <option v-for="object in modalData" :key="object.code" :value="object">{{ object.name }}</option>
+                </select>
+                <!-- It shows the current properties of the course. It changes dynamically. -->
+                <div v-if="selectedCourse">
+                    <p>Code: {{ selectedCourse.code }}</p>
+                    <p>Name: {{ selectedCourse.name }}</p>
+                    <p>Year: {{ selectedCourse.year }}</p>
+                    <p>Credit: {{ selectedCourse.credit }}</p>
+                    <p>Type: {{ selectedCourse.type }}</p>
+                    <p>Department/Service: {{ selectedCourse.department }}</p>
+                    <p>Number of Students: {{ selectedCourse.students }}</p>
+                    <p>Instructor Name: {{ selectedCourse.instructor }}</p>
+                    <p>Course Hour Preference: {{ selectedCourse.hourPreference }}</p>
+                </div>
+                
+                <select v-if="selectedCourse" v-model="editOption">
+                    <p>Select the feature you want to edit</p>
+                    <option disabled value="">Select the feature you want to edit</option>
+                    <option v-for="option in editOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+                <div v-if="editOption !== '' && selectedCourse">
+                    <input v-model="newValue" :placeholder="'Enter new ' + editOption" v-if="editOption !== 'name' && editOption !== 'year' && editOption !== 'credit' && editOption !== 'students' && editOption !== 'hourPreference'">
+                    <input v-model="newValue" :placeholder="'Enter new ' + editOption" v-if="editOption === 'name'">
+                    <input v-model="newValue" :placeholder="'Enter new ' + editOption" v-if="editOption === 'year'">
+                    <input v-model="newValue" :placeholder="'Enter new ' + editOption" v-if="editOption === 'credit'">
+                    <input v-model="newValue" :placeholder="'Enter new ' + editOption" v-if="editOption === 'students'">
+                    <input v-model="newValue" :placeholder="'Enter new ' + editOption" v-if="editOption === 'hourPreference'">
+                    <button @click="edit">Edit</button>
+                </div>
+            </div>
+            
+        </div>
 
         <div v-if="currentView === 'remove' || currentView === 'edit'||currentView === 'add'">
             <button @click="currentView= 'menu'" id="saveBtn"> SAVE</button>
