@@ -21,11 +21,36 @@ const app = Vue.createApp({
                 { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'serviceCourse'},
                 { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
             ],
-            removedCourses: []
+            removedCourses: [],
+            editOptions: [
+                { label: 'Code', value: 'code' },
+                { label: 'Name', value: 'name' },
+                { label: 'Year', value: 'year' },
+                { label: 'Credit', value: 'credit' },
+                { label: 'Type', value: 'type' },
+                { label: 'Department/Service', value: 'department' },
+                { label: 'Number of Students', value: 'students' },
+                { label: 'Instructor Name', value: 'instructor' },
+                { label: 'Course Hour Preference', value: 'hourPreference' }
+            ],
+            editOption: "",
+
         };
     },
     created(){//this part is processed, when app.js is loaded
         this.loadDefaultFiles();
+    },
+    watch: {
+        selectedObject: function(newVal, oldVal) {
+            if (newVal) {
+                // Seçilen dersin bilgilerini göster
+                this.selectedCourse = newVal;
+                this.newCourseCode = newVal.code;
+            } else {
+                this.selectedCourse = null;
+                this.newCourseCode = "";
+            }
+        }
     },
     methods: {
         assignSections(){
@@ -101,7 +126,46 @@ const app = Vue.createApp({
             console.log(this.modalData);
         },
         edit() {
-            console.log(this.modalData);
+            switch (this.editOption) {
+                case 'code':
+                    this.selectedCourse.code = this.newValue;
+                    break;
+                case 'name':
+                    this.selectedCourse.name = this.newValue;
+                    break;
+                case 'year':
+                    this.selectedCourse.year = this.newValue;
+                    break;
+                case 'credit':
+                    this.selectedCourse.credit = this.newValue;
+                    break;
+                case 'type':
+                    this.selectedCourse.type = this.newValue;
+                    break;
+                case 'department':
+                    this.selectedCourse.department = this.newValue;
+                    break;
+                case 'students':
+                    this.selectedCourse.students = this.newValue;
+                    break;
+                case 'instructor':
+                    this.selectedCourse.instructor = this.newValue;
+                    break;
+                case 'hourPreference':
+                    this.selectedCourse.hourPreference = this.newValue;
+                    break;
+                default:
+                    break;
+            }
+
+            console.log(this.selectedObject); 
+        
+            this.newValue = ''; // Reset the input field
+            this.editOption = ''; // Reset the edit option
+        },
+        selectCourse(course) {
+            // Seçilen dersi güncel seçilen ders olarak ayarla
+            this.selectedCourse = course;
         },
         remove(){
             if(this.selectedObject){
