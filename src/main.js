@@ -12,7 +12,8 @@ const app = Vue.createApp({
             serviceCourses: [],
             classrooms: [],
             days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30","16:30"],
+            times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30"],
+            dayTimeSlots:["08:30 - 09:20", "09:30 - 10:20", "10:30 - 11:20", "11:30 - 12:20", "12:30 - 13:20", "13:30 - 14:20", "14:30 - 15:20", "15:30 - 16:20"],
             modalData: null,
             modalType: null,
             sections: [//elements of toolbar 

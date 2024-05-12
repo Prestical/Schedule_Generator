@@ -48,7 +48,7 @@
                         <td class="vertical-text">{{ day.toUpperCase() }}</td>
                         <td>
                             <ul>
-                                <li v-for="time in times" :key="time">{{ time }}</li>
+                                <li v-for="(time , index) in times" :key="index">{{ dayTimeSlots[index] }}</li>
                             </ul>
                         </td>
                         <td v-for="year in 4" :key="`class-${year}`">

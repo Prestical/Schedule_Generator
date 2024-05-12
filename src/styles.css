@@ -12,6 +12,7 @@ body{
     background-position: center; 
     background-repeat: no-repeat;  
     height: 100vh;
+    background-attachment: fixed;
 }
 table {
     width: 60%;
