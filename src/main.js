@@ -12,7 +12,7 @@ const app = Vue.createApp({
             serviceCourses: [],
             classrooms: [],
             days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30"],
+            times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30","16:30"],
             modalData: null,
             modalType: null,
             sections: [//elements of toolbar 
@@ -82,31 +82,38 @@ const app = Vue.createApp({
             this.currentView = view;
         },
         handleSubmit() {
-            const year = Number(this.formData.year);
-            const hourPreference = this.formData.hourPreference;
-            const studentNum = Number(this.formData.students);
-            const credit = Number(this.formData.credit);
-            if (isNaN(year) || year < 1 || year > 4) {
-                alert('Year must be number between 1 and 4.');
-                return false;
-            }
-            if (!/^(\d+\+\d+|\d+)$/.test(hourPreference)) {
-                alert('Hour preference must be a single number or two numbers separated by a "+".');
-                return false;
-            }
-            if (hourPreference.includes('+')) {
-                const parts = hourPreference.split('+').map(part => parseInt(part));
-                if (parts.some(isNaN)) {
-                    alert('Both parts of hour preference must be numbers.');
+            if (this.modalType === "Courses") {
+                const year = Number(this.formData.year);
+                const hourPreference = this.formData.hourPreference;
+                const studentNum = Number(this.formData.students);
+                const credit = Number(this.formData.credit);
+                if (this.modalType === "Courses" && (isNaN(year) || year < 1 || year > 4)) {
+                    alert('Year must be number between 1 and 4.');
+                    return false;
+                }
+                if (this.modalType === "Courses" && (!/^(\d+\+\d+|\d+)$/.test(hourPreference))) {
+                    alert('Hour preference must be a single number or two numbers separated by a "+".');
+                    return false;
+                }
+                if (this.modalType === "Courses" && (isNaN(studentNum) || studentNum <= 0)) {
+                    alert('Invalid case: student must be a number and bigger than 0');
+                    return false;
+                }
+                if (this.modalType === "Courses" && (isNaN(credit) || credit <= 0)) {
+                    alert('Invalid case: credit must be a number and bigger than 0');
                     return false;
                 }
             }
-            if (isNaN(studentNum) || studentNum <= 0) {
-                alert('Invalid case: student must be a number and bigger than 0');
+            else if (this.modalType === "busy" && !(this.formData.times.split(",").every(t => this.times.includes(t)))) {
+                alert('Invalid case: time must be proper format (8:30 or 12:30) and between 8:30 and 15:30');
                 return false;
             }
-            if (isNaN(credit) || credit <= 0) {
-                alert('Invalid case: credit must be a number and bigger than 0');
+            else if (this.modalType === "service" &&!(this.formData.timeSlots.split(",").every(t => this.times.includes(t)))) {
+                alert('Invalid case: time must be proper format ()');
+                return false;
+            }
+            else if(this.modalType==="classroom"&&(isNaN(Number(this.formData.capacity.trim()))||Number(this.formData.capacity.trim())<=0)){
+                alert('Invalid case: capacity must be a number and bigger than 0');
                 return false;
             }
 
@@ -354,7 +361,7 @@ const app = Vue.createApp({
                     return;
                 const parts = line.split(',');
                 const timeParts = parts.slice(2).map(time => time.replace(/"/g, '').trim());
-                if (!timeParts.every(time => this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
+                if (!timeParts.every(time  => this.times.includes(time))) throw new Error(`Invalid case: ${line}`);
                 result.push({ name: parts[0].trim(), day: parts[1].trim(), times: timeParts });
             })
             this.busyTimes = result;
@@ -427,7 +434,7 @@ const app = Vue.createApp({
             if (this.placeServiceCourses() == false) {//!if this method returns false that means a thre is a propblem about service courses (probably an alert appeared on page)
                 return false;//! dont show the schedule if there exits a problem
             }
-            const serviceCodes = this.serviceCourses.map(service => service.code) 
+            const serviceCodes = this.serviceCourses.map(service => service.code)
             for (const course of this.courses) {
                 if (!serviceCodes.includes(course.code)) {//!skips service lesson because they already placed on schedule
                     if (!this.placeCourse(course)) {
