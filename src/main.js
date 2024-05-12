@@ -164,6 +164,47 @@ const app = Vue.createApp({
             this.assignSections();
         },
         edit() { // Cant save the changes to the specific array (it can show changes immediately in same page)
+            if (this.modalType === "Courses") {
+                const year = Number(this.newValue);
+                const hourPreference = this.newValue;
+                const studentNum = Number(this.newValue);
+                const credit = Number(this.newValue);
+                if (this.editOption === "year" && (isNaN(year) || year < 1 || year > 4)) {
+                    alert('Year must be number between 1 and 4.');
+                    this.resetElements();
+                    return false;
+                }
+                if (this.editOption === "hourPreference" && (!/^(\d+\+\d+|\d+)$/.test(hourPreference))) {
+                    alert('Hour preference must be a single number or two numbers separated by a "+".');
+                    this.resetElements();
+                    return false;
+                }
+                if (this.editOption === "students" && (isNaN(studentNum) || studentNum <= 0)) {
+                    alert('Invalid case: student must be a number and bigger than 0');
+                    this.resetElements();
+                    return false;
+                }
+                if (this.editOption === "credit" && (isNaN(credit) || credit <= 0)) {
+                    alert('Invalid case: credit must be a number and bigger than 0');
+                    this.resetElements();
+                    return false;
+                }
+            }
+            else if ( this.editOption === 'times' && (this.modalType === "busy" && !(this.newValue.split(",").every(t => this.times.includes(t))))) {
+                alert('Invalid case: time must be proper format (8:30 or 12:30) and between 8:30 and 15:30');
+                this.resetElements();
+                return false;
+            }
+            else if ( this.editOption === 'timeSlots' && (this.modalType === "service" &&!(this.newValue.split(",").every(t => this.times.includes(t))))) {
+                alert('Invalid case: time must be proper format ()');
+                this.resetElements();
+                return false;
+            }
+            else if(this.editOption === 'capacity' && (this.modalType==="classroom"&&(isNaN(Number(this.newValue.trim()))||Number(this.newValue.trim())<=0))){
+                alert('Invalid case: capacity must be a number and bigger than 0');
+                this.resetElements();
+                return false;
+            }
             switch (this.editOption) {
                 case 'code':
                     this.selectedObject.code = this.newValue;
@@ -208,7 +249,9 @@ const app = Vue.createApp({
                     break;
             }
             console.log(this.selectedObject);
-
+            this.resetElements();
+        },
+        resetElements(){
             this.newValue = ''; // Reset the input field
             this.editOption = ''; // Reset the edit option
             this.selectedObject = {};
