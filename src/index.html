@@ -71,17 +71,17 @@
                 </div>
                 <div v-if="modalType === 'service' || modalType === 'busy'" v-for="key in Object.keys(modalData[0])">
                     <label class="custom-label">{{ key.toUpperCase() }}: </label>
-                    <select v-if="modalType === 'busy'" v-model="formData[key]">
+                    <select v-if="modalType === 'busy' && key !== 'times'" v-model="formData[key]">
                         <option v-if="key === 'name'" v-for="instructor in uniqueInstructors" :key="instructor" :value="instructor">{{ instructor }}</option>
                         <option v-if="key === 'day'" v-for="day in days" :key="day" :value="day">{{ day }}</option>
-                        <option v-if="key === 'times'" v-for="time in times" :key="time" :value="time">{{ time }}</option>
                         <!-- There is an error in time selection-->
                     </select>
-                    <select v-if="modalType === 'service'" v-model="formData[key]">
-                        <option v-if="key === 'code'" v-for="obj in modalData" :key="obj" :value="obj">{{ obj.code }}</option>
+                    <input v-if="key === 'times'" class="custom-input" :id="key" v-model="formData[key]" :required="true">
+                    <select v-if="modalType === 'service' && key !== 'timeSlots'" v-model="formData[key]">
+                        <option v-if="key === 'code'" v-for="course in courses" :key="course.code" :value="course.code">{{ course.code }}</option>
                         <option v-if="key === 'day'" v-for="day in days" :key="day" :value="day">{{ day }}</option>
-                        <option v-if="key === 'timeslots'" v-for="time in times" :key="time" :value="time">{{ time }}</option>
                     </select>
+                    <input v-if="key === 'timeSlots'" class="custom-input" :id="key" v-model="formData[key]" :required="true">
                 </div>
                 <input id="addInput" type="submit" value="Submit" @click="add">
             </form>
@@ -119,17 +119,17 @@
                     <option v-if="modalType === 'service'" v-for="object in modalData" :key="object.code" :value="object">{{ object.code }}</option>
                 </select>
                 <!-- It shows the current properties of the course. It changes dynamically. -->
-                <div v-if="selectedCourse">
-                    <template v-for="element in Object.entries(selectedCourse)">
+                <div v-if="selectedObject">
+                    <template v-for="element in Object.entries(selectedObject)">
                         <p> {{element[0].toUpperCase()}}: {{element[1]}} </p>
                     </template>
                 </div>
-                <select v-if="selectedCourse" v-model="editOption">
+                <select v-if="selectedObject" v-model="editOption">
                     <p>Select the feature you want to edit</p>
                     <option disabled value="">Select the feature you want to edit</option>
                     <option v-for="entry in Object.entries(modalData[0])" :key="entry[0]" :value="entry[0]">{{ entry[0].toUpperCase()}}</option>
                 </select>
-                <div v-if="editOption !== '' && selectedCourse">
+                <div v-if="editOption !== '' && selectedObject">
                     <template v-for="element in Object.keys(selectedCourse)">
                         <input v-model="newValue" :placeholder="`Enter new ${element}`" v-if="editOption === element">
                     </template>

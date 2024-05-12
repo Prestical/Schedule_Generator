@@ -22,7 +22,6 @@ const app = Vue.createApp({
                 { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
             ],
             removedCourses: [],
-            selectedTimes: [],
             editOption: "",
         };
     },
@@ -108,13 +107,13 @@ const app = Vue.createApp({
                     this.busyTimes.push({
                         name: this.formData.name.trim(),
                         day: this.formData.day.trim(),
-                        times: this.selectedTimes // Normally it gets array but now null
+                        times: this.formData.times.trim().split(',').map(time => time.trim())
                     });
                 } else if (this.modalType === 'service') {
                     this.serviceCourses.push({
-                        name: this.formData.code.trim(),
+                        code: String(this.formData.code).trim(),
                         day: this.formData.day.trim(),
-                        timeSlots: this.selectedTimes // Normally it gets array but now null
+                        timeSlots: this.formData.timeSlots.trim().split(',').map(time => time.trim())
                     });
                 } else if (this.modalType === 'classroom') {
                     this.classrooms.push({
@@ -130,36 +129,48 @@ const app = Vue.createApp({
         edit() { // Cant save the changes to the specific array (it can show changes immediately in same page)
             switch (this.editOption) {
                 case 'code':
-                    this.selectedCourse.code = this.newValue;
+                    this.selectedObject.code = this.newValue;
                     break;
                 case 'name':
-                    this.selectedCourse.name = this.newValue;
+                    this.selectedObject.name = this.newValue;
+                    break;
+                case 'day':
+                    this.selectedObject.day = this.newValue;
+                    break;
+                case 'times': // Can accept multiple time inputs
+                    this.selectedObject.times = String(this.newValue).trim().split(',').map(time => time.trim());
+                    break;
+                case 'capacity':
+                    this.selectedObject.capacity = this.newValue;
+                    break;
+                case 'timeSlots': // Can accept multiple time inputs
+                    this.selectedObject.timeSlots = String(this.newValue).trim().split(',').map(time => time.trim());
                     break;
                 case 'year':
-                    this.selectedCourse.year = this.newValue;
+                    this.selectedObject.year = this.newValue;
                     break;
                 case 'credit':
-                    this.selectedCourse.credit = this.newValue;
+                    this.selectedObject.credit = this.newValue;
                     break;
                 case 'type':
-                    this.selectedCourse.type = this.newValue;
+                    this.selectedObject.type = this.newValue;
                     break;
                 case 'department':
-                    this.selectedCourse.department = this.newValue;
+                    this.selectedObject.department = this.newValue;
                     break;
                 case 'students':
-                    this.selectedCourse.students = this.newValue;
+                    this.selectedObject.students = this.newValue;
                     break;
                 case 'instructor':
-                    this.selectedCourse.instructor = this.newValue;
+                    this.selectedObject.instructor = this.newValue;
                     break;
                 case 'hourPreference':
-                    this.selectedCourse.hourPreference = this.newValue;
+                    this.selectedObject.hourPreference = this.newValue;
                     break;
                 default:
                     break;
             }
-            console.log(this.selectedObject); 
+            console.log(this.selectedObject);
         
             this.newValue = ''; // Reset the input field
             this.editOption = ''; // Reset the edit option
@@ -240,6 +251,7 @@ const app = Vue.createApp({
         },
         saveChanges(){
             console.log(this.modalData)
+            this.removedCourses = [];
             this.updateFile(this.modalType+'.csv')
         },
         async updateFile(fileName) {
