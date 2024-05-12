@@ -23,6 +23,8 @@ const app = Vue.createApp({
             ],
             removedCourses: [],
             editOption: "",
+            timeRegex : /^(2[0-3]|[01]?[0-9]):([0-5]?[0-9])$/,
+            newValue: null
         };
     },
     created(){//this part is processed, when app.js is loaded
@@ -70,7 +72,6 @@ const app = Vue.createApp({
         handleDrop(event) {
             const files = Array.from(event.dataTransfer.files);
             const csvFiles = files.filter(file => file.name.endsWith('.csv'));
-            
             if (csvFiles.length > 0) {
                 this.handleFiles({ target: { files: csvFiles } });
             } else {
@@ -81,11 +82,12 @@ const app = Vue.createApp({
             this.currentView = view;
         },
         handleSubmit() {
-            // Modified from Dilek
-            const year = parseInt(this.formData.year);
+            const year = Number(this.formData.year);
             const hourPreference = this.formData.hourPreference;
-            if (year < 1 || year > 4) {
-                alert('Year must be between 1 and 4.');
+            const studentNum=Number(this.formData.students);
+            const credit = Number(this.formData.credit);
+            if (isNaN(year)||year < 1 || year > 4) {
+                alert('Year must be number between 1 and 4.');
                 return false;
             }
             if (!/^(\d+\+\d+|\d+)$/.test(hourPreference)) {
@@ -98,6 +100,14 @@ const app = Vue.createApp({
                     alert('Both parts of hour preference must be numbers.');
                     return false;
                 }
+            }
+            if(isNaN(studentNum)||studentNum<=0) {
+                alert('Invalid case: student must be a number and bigger than 0');
+                return false;
+            }
+            if(isNaN(credit)||credit<=0){
+                alert('Invalid case: credit must be a number and bigger than 0');
+                return false;
             }
         
             console.log('Form submitted:', this.formData);
@@ -234,21 +244,26 @@ const app = Vue.createApp({
                     this.files[file.name]=e.target.result;
                     try {
                         if(file.name==='Courses.csv'){
-                            this.courses=this.parseCourses(e.target.result);
+                            this.parseCourses(e.target.result);
                         } else if (file.name === 'busy.csv') {
-                            this.busyTimes = this.parseBusy(e.target.result);
+                            this.parseBusy(e.target.result);
                         } else if (file.name === 'service.csv') {
-                            this.serviceCourses = this.parseService(e.target.result);
+                           this.parseService(e.target.result);
                         } else if (file.name === 'classroom.csv') {
-                            this.classrooms = this.parseClassrooms(e.target.result);
+                            this.parseClassrooms(e.target.result);
+                        }
+                        else{
+                            throw new Error();
                         }
                     } catch (parseError) {
                         alert(`Error parsing ${file.name}: ${parseError.message}`);
+                        return;
                     }
                 };
                 reader.readAsText(file);
             })
             this.assignSections();
+            console.log("Files loaded successfully!")
         },
         async loadDefaultFiles() {
             try {
@@ -258,24 +273,25 @@ const app = Vue.createApp({
                     fetch('data/service.csv').then(res => res.text()),
                     fetch('data/classroom.csv').then(res => res.text())
                 ]);
-                this.courses = this.parseCourses(responses[0]);
-                this.busyTimes = this.parseBusy(responses[1]);
-                this.serviceCourses = this.parseService(responses[2]);
-                this.classrooms = this.parseClassrooms(responses[3]);
+                this.parseCourses(responses[0]);
+                this.parseBusy(responses[1]);
+                this.parseService(responses[2]);
+                this.parseClassrooms(responses[3]);
                 this.assignSections();
+                console.log("Default files loaded successfully!");
             } catch (error) {
                 console.error('Failed to load default files:', error);
                 alert('Failed to load one or more default files. Please check the console for more details.');
             }
         },
         saveChanges(){
-            console.log(this.modalData)
             this.removedCourses = [];
-            this.updateFile(this.modalType+'.csv')
+            this.updateFile();
         },
-        async updateFile(fileName) {
-            console.log('Updating file ' + fileName);
+        async updateFile() {
+            const fileName=(this.modalType+'.csv');
             const content=this.modalData;
+            console.log('Updating file ' + fileName);
             console.log(content)
             switch (fileName) {
                 case "course":
@@ -327,7 +343,7 @@ const app = Vue.createApp({
                     hourPreference:parts[8]
                   })
             })
-            return result;
+            this.courses = result;
         },
         parseBusy(content){
             const result=[];
@@ -337,9 +353,10 @@ const app = Vue.createApp({
                     return;
                 const parts=line.split(',');
                 const timeParts = parts.slice(2).map(time => time.replace(/"/g,'').trim());
+                if(!timeParts.every(time => this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
                 result.push({ name :parts[0].trim(), day:parts[1].trim(), times: timeParts });
             })
-            return result;
+            this.busyTimes = result;
         },
         parseService(content){
             const result=[];
@@ -347,15 +364,16 @@ const app = Vue.createApp({
             lines.forEach(line=>{
                 if(line.trim()=='')
                     return;
-                    const parts = line.split(',');
+                    const parts = line.split(',').map(element => element.trim());
                     const times = parts.slice(2).map(time => time.replace(/"/g,'').trim());
+                    if(!times.every(time=> this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
                         result.push({
                             code: parts[0].trim(),
                             day: parts[1].trim(),
                             timeSlots: times.map(time => time.trim())
                         });
             })
-            return result;
+            this.serviceCourses = result;
         },
         parseClassrooms(content){
             const result=[];
@@ -369,7 +387,7 @@ const app = Vue.createApp({
                     capacity:Number(parts[1].trim())
                 })
             })
-            return result;
+            this.classrooms = result;
         },
         generateSchedule() {
             this.createTimeSchedule();

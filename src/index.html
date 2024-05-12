@@ -17,7 +17,7 @@
                     <button class="dropbtn">{{ section.title.toUpperCase() }}</button>
                     <div class="dropdown-content" >
                         <a href="#" @click=" modalData=section.dataSet; modalType=section.type; toggleView('add')">ADD</a>
-                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; edit(); toggleView('edit')">EDIT</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; toggleView('edit')">EDIT</a>
                         <a href="#" @click=" modalData=section.dataSet; modalType=section.type; toggleView('remove')">REMOVE</a>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                     <div class="icon">
                         <img src="img/csvIcon.png" alt="csv icon" style="width: 75px;">
                     </div>
-                    <h6> Drag & Drop Your Files <br> or Browse Files</h6>
+                    <h6> Drag & Drop Your Files/File <br> or Browse Files/File</h6>
                     <span> Supported Format: csv </span>
                     <input type="file" ref="fileInput"  @change="handleFiles"  accept=".csv"  multiple  hidden>
                 </div>
@@ -138,8 +138,9 @@
             </div>
         </div>
 
-        <div v-if="currentView === 'remove' || currentView === 'edit'||currentView === 'add'">
-            <button @click="saveChanges(); currentView= 'menu'"  id="saveBtn"> SAVE</button>
+        <div v-if="currentView === 'remove' || currentView === 'edit'||currentView === 'add'" class="tooltip-container">
+            <button @click="saveChanges(); currentView= 'menu'"  id="saveBtn"> SAVE CHANGES TO FILE</button>
+            <span class="tooltip-text">If you want to use the save button, you must work on the server (server.js).</span>
         </div>
 
     </div>
