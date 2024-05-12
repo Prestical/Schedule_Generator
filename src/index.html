@@ -62,8 +62,7 @@
         </div>
         <!-- add,delete,edit operations section -->
         <div class="addContainer" v-if=currentView==="add"> <!-- When we open add/remove/edit option it will show that csv file attribute-->
-            <h3> Add an element to {{modalType.toUpperCase()}} </h3>
-            <p>  Example Input : <em>{{Object.values(modalData[0])}}</em> </p>
+            <h3> ADD AN ELEMENT TO {{modalType.toUpperCase()}} </h3>
             <form id="addForm" @submit.prevent="handleSubmit">
                 <div v-if="modalType !== 'service' && modalType !== 'busy'" v-for="key in Object.keys(modalData[0])">
                     <label class="custom-label">{{ key.toUpperCase() }}: </label>
@@ -71,51 +70,44 @@
                 </div>
                 <div v-if="modalType === 'service' || modalType === 'busy'" v-for="key in Object.keys(modalData[0])">
                     <label class="custom-label">{{ key.toUpperCase() }}: </label>
-                    <select v-if="modalType === 'busy' && key !== 'times'" v-model="formData[key]">
+                    <select id="busyTimeSelec" v-if="modalType === 'busy' && key !== 'times'" v-model="formData[key]">
                         <option v-if="key === 'name'" v-for="instructor in uniqueInstructors" :key="instructor" :value="instructor">{{ instructor }}</option>
                         <option v-if="key === 'day'" v-for="day in days" :key="day" :value="day">{{ day }}</option>
                         <!-- There is an error in time selection-->
                     </select>
                     <input v-if="key === 'times'" class="custom-input" :id="key" v-model="formData[key]" :required="true">
-                    <select v-if="modalType === 'service' && key !== 'timeSlots'" v-model="formData[key]">
+                    <select id="serviceTimeSelec" v-if="modalType === 'service' && key !== 'timeSlots'" v-model="formData[key]">
                         <option v-if="key === 'code'" v-for="course in courses" :key="course.code" :value="course.code">{{ course.code }}</option>
                         <option v-if="key === 'day'" v-for="day in days" :key="day" :value="day">{{ day }}</option>
                     </select>
                     <input v-if="key === 'timeSlots'" class="custom-input" :id="key" v-model="formData[key]" :required="true">
                 </div>
-                <input id="addInput" type="submit" value="Submit" @click="add || handleSubmit">
+                <input id="addInput" type="submit" value="SUBMIT" @click="add || handleSubmit">
             </form>
         </div>
         <div v-if=currentView==="remove" class="removeContainer"> 
-            <h3> Remove an element in {{modalType.toUpperCase()}} </h3>
-                
-            <div>
+            <h3> REMOVE AN ELEMENT IN {{modalType.toUpperCase()}} </h3>
+            <div id="removeForm">
+                <p>PLEASE SELECT A COURSE</p>
                 <select v-model="selectedObject">
                     <option disabled value="">Please select</option>
                     <option v-if="modalType !== 'service' && modalType !== 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name }}</option>
-                    <option v-if="modalType === 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name }} {{object.times}}</option>
+                    <option id="busyOption" v-if="modalType === 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name}} {{object.times}}</option>
                     <option v-if="modalType === 'service'" v-for="object in modalData" :key="object.code" :value="object">{{ object.code }}</option>
                 </select>
-                <button @click="remove">REMOVE</button>
                 <p v-if="modalType !== 'service'">Selected Object: {{ selectedObject.name }}</p>
                 <p v-if="modalType === 'service'">Selected Object: {{ selectedObject.code }}</p>
-            </div>
-            <div v-if="removedCourses.length > 0">
-                <h2 id="removeH">Removed Courses</h2>
-                <ul id="removeUl">
-                    <li v-for="course in removedCourses" :key="course.code">
-                        {{ course.code }} - {{ course.name }}
-                    </li>
-                </ul>
+                <button @click="remove">REMOVE</button>
             </div>
         </div>
         <div v-if=currentView==="edit" class="editContainer"> 
-            <h3 id="editH"> Edit an element in {{modalType.toUpperCase()}} </h3>
-            <div>
+            <h3 id="editH"> EDIT AN ELEMENT IN {{modalType.toUpperCase()}} </h3>
+            <div id="editForm">
+                <p id="editP">PLEASE SELECT AN COURSE</p>
                 <select v-model="selectedObject">
-                    <option disabled value="">Please select</option>
-                    <option v-if="modalType !== 'service' && modalType !== 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name }}</option>
-                    <option v-if="modalType === 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name }} {{object.times}}</option>
+                    <option disabled value=""></option>
+                    <option v-if="modalType !== 'service' && modalType !== 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name}}</option>
+                    <option v-if="modalType === 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name}} {{object.times}}</option>
                     <option v-if="modalType === 'service'" v-for="object in modalData" :key="object.code" :value="object">{{ object.code }}</option>
                 </select>
                 <!-- It shows the current properties of the course. It changes dynamically. -->
@@ -133,7 +125,7 @@
                     <template v-for="element in Object.keys(selectedCourse)">
                         <input v-model="newValue" :placeholder="`Enter new ${element}`" v-if="editOption === element">
                     </template>
-                    <button @click="edit">Edit</button>
+                    <button @click="edit">EDIT</button>
                 </div>
             </div>
         </div>
