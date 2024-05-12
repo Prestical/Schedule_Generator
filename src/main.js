@@ -1,6 +1,6 @@
 const app = Vue.createApp({
-    
-    data(){
+
+    data() {
         return {
             currentView: 'menu', //starts the page with menu
             formData: {},
@@ -16,22 +16,22 @@ const app = Vue.createApp({
             modalData: null,
             modalType: null,
             sections: [//elements of toolbar 
-                { title: 'Courses', dataSet: this.courses ,type: 'Courses'},
-                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busy'},
-                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'service'},
-                { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
+                { title: 'Courses', dataSet: this.courses, type: 'Courses' },
+                { title: 'Busy Times', dataSet: this.busyTimes, type: 'busy' },
+                { title: 'Service Courses', dataSet: this.serviceCourses, type: 'service' },
+                { title: 'Classrooms', dataSet: this.classrooms, type: 'classroom' }
             ],
             removedCourses: [],
             editOption: "",
-            timeRegex : /^(2[0-3]|[01]?[0-9]):([0-5]?[0-9])$/,
+            timeRegex: /^(2[0-3]|[01]?[0-9]):([0-5]?[0-9])$/,
             newValue: null
         };
     },
-    created(){//this part is processed, when app.js is loaded
+    created() {//this part is processed, when app.js is loaded
         this.loadDefaultFiles();
     },
     watch: {
-        selectedObject: function(newVal, oldVal) {
+        selectedObject: function (newVal, oldVal) {
             if (newVal) {
                 // Seçilen dersin bilgilerini göster
                 this.selectedCourse = newVal;
@@ -52,12 +52,12 @@ const app = Vue.createApp({
         }
     },
     methods: {
-        assignSections(){
-            this.sections= [//elements of toolbar 
-                { title: 'Courses', dataSet: this.courses ,type: 'Courses'},
-                { title: 'Busy Times', dataSet: this.busyTimes ,type: 'busy'},
-                { title: 'Service Courses', dataSet: this.serviceCourses ,type: 'service'},
-                { title: 'Classrooms', dataSet: this.classrooms ,type:'classroom'}
+        assignSections() {
+            this.sections = [//elements of toolbar 
+                { title: 'Courses', dataSet: this.courses, type: 'Courses' },
+                { title: 'Busy Times', dataSet: this.busyTimes, type: 'busy' },
+                { title: 'Service Courses', dataSet: this.serviceCourses, type: 'service' },
+                { title: 'Classrooms', dataSet: this.classrooms, type: 'classroom' }
             ]
         },
         triggerFileInput() {
@@ -84,9 +84,9 @@ const app = Vue.createApp({
         handleSubmit() {
             const year = Number(this.formData.year);
             const hourPreference = this.formData.hourPreference;
-            const studentNum=Number(this.formData.students);
+            const studentNum = Number(this.formData.students);
             const credit = Number(this.formData.credit);
-            if (isNaN(year)||year < 1 || year > 4) {
+            if (isNaN(year) || year < 1 || year > 4) {
                 alert('Year must be number between 1 and 4.');
                 return false;
             }
@@ -101,25 +101,25 @@ const app = Vue.createApp({
                     return false;
                 }
             }
-            if(isNaN(studentNum)||studentNum<=0) {
+            if (isNaN(studentNum) || studentNum <= 0) {
                 alert('Invalid case: student must be a number and bigger than 0');
                 return false;
             }
-            if(isNaN(credit)||credit<=0){
+            if (isNaN(credit) || credit <= 0) {
                 alert('Invalid case: credit must be a number and bigger than 0');
                 return false;
             }
-        
+
             console.log('Form submitted:', this.formData);
             this.add();
         },
-        addTime(time){
+        addTime(time) {
             this.selectedTimes.push(time);
             console.log(this.selectedTimes);
         },
         add() {// There is an error in Add serviseCourse section
             console.log(this.modalData);
-            if(Object.keys(this.formData).length > 0){
+            if (Object.keys(this.formData).length > 0) {
                 if (this.modalType === 'Courses') {
                     this.courses.push({
                         code: this.formData.code.trim(),
@@ -200,7 +200,7 @@ const app = Vue.createApp({
                     break;
             }
             console.log(this.selectedObject);
-        
+
             this.newValue = ''; // Reset the input field
             this.editOption = ''; // Reset the edit option
             this.selectedObject = {};
@@ -209,8 +209,8 @@ const app = Vue.createApp({
             // Seçilen dersi güncel seçilen ders olarak ayarla
             this.selectedCourse = course;
         },
-        remove(){ // (it can not show changes immediately in same page) Also when we open different remove sections removedCourses show past deleteions
-            if (this.selectedObject){
+        remove() { // (it can not show changes immediately in same page) Also when we open different remove sections removedCourses show past deleteions
+            if (this.selectedObject) {
                 if (this.modalType === 'Courses') {
                     this.courses = this.courses.filter(obj => obj.code !== this.selectedObject.code);
                     this.modalData = this.courses;
@@ -229,30 +229,30 @@ const app = Vue.createApp({
                 this.selectedObject = {};
                 this.assignSections();
             }
-           
+
         },
-        getCourse(day,timeSlot,year){
-            const timeIndex=this.getTimeIndex(timeSlot)
-            courseInfo=this.schedule[day][timeIndex].courses[year-1]
-            return courseInfo[0]==null?"&nbsp;":courseInfo[0]+" "+courseInfo[1];
+        getCourse(day, timeSlot, year) {
+            const timeIndex = this.getTimeIndex(timeSlot)
+            courseInfo = this.schedule[day][timeIndex].courses[year - 1]
+            return courseInfo[0] == null ? "&nbsp;" : courseInfo[0] + " " + courseInfo[1];
         },
-        handleFiles(event){
-            const files=event.target.files;
+        handleFiles(event) {
+            const files = event.target.files;
             Array.from(files).forEach(file => {
-                const reader=new FileReader();
-                reader.onload = e =>{
-                    this.files[file.name]=e.target.result;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    this.files[file.name] = e.target.result;
                     try {
-                        if(file.name==='Courses.csv'){
+                        if (file.name === 'Courses.csv') {
                             this.parseCourses(e.target.result);
                         } else if (file.name === 'busy.csv') {
                             this.parseBusy(e.target.result);
                         } else if (file.name === 'service.csv') {
-                           this.parseService(e.target.result);
+                            this.parseService(e.target.result);
                         } else if (file.name === 'classroom.csv') {
                             this.parseClassrooms(e.target.result);
                         }
-                        else{
+                        else {
                             throw new Error();
                         }
                     } catch (parseError) {
@@ -284,13 +284,13 @@ const app = Vue.createApp({
                 alert('Failed to load one or more default files. Please check the console for more details.');
             }
         },
-        saveChanges(){
+        saveChanges() {
             this.removedCourses = [];
             this.updateFile();
         },
         async updateFile() {
-            const fileName=(this.modalType+'.csv');
-            const content=this.modalData;
+            const fileName = (this.modalType + '.csv');
+            const content = this.modalData;
             console.log('Updating file ' + fileName);
             console.log(content)
             switch (fileName) {
@@ -298,17 +298,17 @@ const app = Vue.createApp({
             }
             try {
                 const response = await fetch('http://localhost:3030/update-data', {//you can change the port (3030), if required, dont forget to change the port in server.js as well
-                    method: 'POST', 
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ fileName, content })
                 });
-        
+
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
-                
+
                 const responseData = await response.json();
                 console.log(responseData);  // Log the response data from the server
             } catch (error) {
@@ -318,189 +318,211 @@ const app = Vue.createApp({
         createTimeSchedule() {
             const schedule = {};
             this.days.forEach(day => {
-                schedule[day] = this.times.map(time => ({ 
-                    time: time, 
-                    courses: Array(4).fill(Array(2).fill(null))}));//each row keeps different year and each column keeps course code and class
+                schedule[day] = this.times.map(time => ({
+                    time: time,
+                    courses: Array(4).fill(Array(2).fill(null))
+                }));//each row keeps different year and each column keeps course code and class
             });
             this.schedule = schedule;
         },
-        parseCourses(content){
-            const result=[];
-            const lines=content.split('\n');
-            lines.forEach(line=>{
-                if(line.trim()==='')
-                return;
+        parseCourses(content) {
+            const result = [];
+            const lines = content.split('\n');
+            lines.forEach(line => {
+                if (line.trim() === '')
+                    return;
                 const parts = line.split(',');
                 result.push({
-                    code:parts[0].trim(),
-                    name:parts[1].trim(),
-                    year:parts[2].trim(),
-                    credit:parts[3].trim(),
-                    type:parts[4].trim(),
-                    department:parts[5].trim(),
-                    students:Number(parts[6].trim()),
-                    instructor:parts[7].trim(),
-                    hourPreference:parts[8]
-                  })
+                    code: parts[0].trim(),
+                    name: parts[1].trim(),
+                    year: parts[2].trim(),
+                    credit: parts[3].trim(),
+                    type: parts[4].trim(),
+                    department: parts[5].trim(),
+                    students: Number(parts[6].trim()),
+                    instructor: parts[7].trim(),
+                    hourPreference: parts[8]
+                })
             })
             this.courses = result;
         },
-        parseBusy(content){
-            const result=[];
-            const lines=content.split('\n');
-            lines.forEach(line=>{
-                if(line.trim()=='')
+        parseBusy(content) {
+            const result = [];
+            const lines = content.split('\n');
+            lines.forEach(line => {
+                if (line.trim() == '')
                     return;
-                const parts=line.split(',');
-                const timeParts = parts.slice(2).map(time => time.replace(/"/g,'').trim());
-                if(!timeParts.every(time => this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
-                result.push({ name :parts[0].trim(), day:parts[1].trim(), times: timeParts });
+                const parts = line.split(',');
+                const timeParts = parts.slice(2).map(time => time.replace(/"/g, '').trim());
+                if (!timeParts.every(time => this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
+                result.push({ name: parts[0].trim(), day: parts[1].trim(), times: timeParts });
             })
             this.busyTimes = result;
         },
-        parseService(content){
-            const result=[];
-            const lines=content.split('\n');
-            lines.forEach(line=>{
-                if(line.trim()=='')
+        parseService(content) {
+            const result = [];
+            const lines = content.split('\n');
+            lines.forEach(line => {
+                if (line.trim() == '')
                     return;
-                    const parts = line.split(',').map(element => element.trim());
-                    const times = parts.slice(2).map(time => time.replace(/"/g,'').trim());
-                    if(!times.every(time=> this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
-                        result.push({
-                            code: parts[0].trim(),
-                            day: parts[1].trim(),
-                            timeSlots: times.map(time => time.trim())
-                        });
+                const parts = line.split(',').map(element => element.trim());
+                const times = parts.slice(2).map(time => time.replace(/"/g, '').trim());
+                if (!times.every(time => this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
+                result.push({
+                    code: parts[0].trim(),
+                    day: parts[1].trim(),
+                    timeSlots: times.map(time => time.trim())
+                });
             })
             this.serviceCourses = result;
         },
-        parseClassrooms(content){
-            const result=[];
-            const lines=content.split('\n');
-            lines.forEach(line=>{
-                if(line.trim()=='')
+        parseClassrooms(content) {
+            const result = [];
+            const lines = content.split('\n');
+            lines.forEach(line => {
+                if (line.trim() == '')
                     return;
-                const parts=line.split(';')
+                const parts = line.split(';')
                 result.push({
-                    name:parts[0].trim(),
-                    capacity:Number(parts[1].trim())
+                    name: parts[0].trim(),
+                    capacity: Number(parts[1].trim())
                 })
             })
             this.classrooms = result;
         },
         generateSchedule() {
             this.createTimeSchedule();
-            if(this.placeCourses()){
+            if (this.placeCourses()) {
                 this.toggleView("schedule")
             }
-            
+
         },
-        getSuitableClassroom(studentNum,timeSlots,day){
-            apClass=null;
-            classCapacity=Number.MAX_VALUE;
+        getSuitableClassroom(studentNum, timeSlots, day) {
+            apClass = null;//keeps appropriate classroom if it is exist
+            classCapacity = Number.MAX_VALUE;
             this.classrooms.forEach(classroom => {
-                isClassAvailable=true;
-                size=classroom.capacity;
-                timeSlots.forEach(timeS=>{
-                    let scheduleArray = this.schedule[day][this.times.indexOf(timeS)].courses;
-                    for (let i = 0; i < scheduleArray.length&&isClassAvailable; i++) {
+                isClassAvailable = true;
+                size = classroom.capacity;
+                timeSlots.forEach(timeS => {//!checks all time slots of the course sent
+                    let scheduleArray = this.schedule[day][this.getTimeIndex(timeS)].courses;
+                    for (let i = 0; i < scheduleArray.length && isClassAvailable; i++) {
                         let temp = scheduleArray[i];
                         if (classroom.name === temp[1]) {//makes false if classroom already exists a course
                             isClassAvailable = false;
                         }
                     }
                 })
-                if(isClassAvailable&&studentNum<=size&&classCapacity>size){//changes the classroom with appropriate nad smaller one to save useless seats
-                    apClass=classroom.name
-                    classCapacity=classroom.capacity
+                if (isClassAvailable && studentNum <= size && classCapacity > size) {//changes the classroom with appropriate and smaller one to save useless seats 
+                    //!for example if current classroom is B503(160 seats) and next class is c501(60 seats) this block changes the appClass to c501
+                    apClass = classroom.name
+                    classCapacity = classroom.capacity
                 }
             })
             return apClass;
         },
-        getTimeIndex(hour){
+        getTimeIndex(hour) {
             return this.times.indexOf(hour);
         },
         placeCourses() {
-            this.placeServiceCourses();
-            const serviceCodes=this.serviceCourses.map(service=> service.code)
-            for(const course of this.courses){
-                if(!serviceCodes.includes(course.code)){
-                    if(!this.placeCourse(course)){
-                        return false;
+            if (this.placeServiceCourses() == false) {//!if this method returns false that means a thre is a propblem about service courses (probably an alert appeared on page)
+                return false;//! dont show the schedule if there exits a problem
+            }
+            const serviceCodes = this.serviceCourses.map(service => service.code) 
+            for (const course of this.courses) {
+                if (!serviceCodes.includes(course.code)) {//!skips service lesson because they already placed on schedule
+                    if (!this.placeCourse(course)) {
+                        return false;//! dont show the schedule if there exits a problem
                     }
                 }
             }
             return true;
         },
-        placeServiceCourses(){
-            this.serviceCourses.forEach(course=>{
-                courseInfo=this.courses.find(temp => temp.code === course.code)
-                classroom=this.getSuitableClassroom(courseInfo.students,course.timeSlots,course.day);
-                if(classroom!=null && this.isTimeSlotsAvaiable(course.day,course.timeSlots,courseInfo.year)){
-                    course.timeSlots.forEach(timeSlot=>{
-                        const timeIndex=this.times.indexOf(timeSlot)
-                        this.schedule[course.day][timeIndex].courses[courseInfo.year-1]=[course.code,classroom];
-                    }) 
-                    
+        placeServiceCourses() {
+            for (const course of this.serviceCourses) {
+                courseInfo = this.courses.find(temp => temp.code === course.code);//! gets all info(credit, students etc.) about service course
+                classroom = this.getSuitableClassroom(courseInfo.students, course.timeSlots, course.day);
+                if (classroom == null) {
+                    alert(`There is no suitable classroom for service course: ${course.code}`);
+                    return false;
                 }
-            })
-        },
-        placeCourse(course,excludedDay="",block=null){
-            if(block==null){
-                block=course.hourPreference.trim().split('+').map(num => Number(num));
+                if (this.isTimeSlotsAvaiable(course.day, course.timeSlots, courseInfo.year)) {
+                    course.timeSlots.forEach(timeSlot => {//! places course for all time slots for ex. (ENGR254,Tuesday, timeSlots:"13:30,14:30,15:30" )
+                        const timeIndex = this.times.indexOf(timeSlot)
+                        this.schedule[course.day][timeIndex].courses[courseInfo.year - 1] = [course.code, classroom];
+                    })
+                }
+                else {
+                    alert(`There is already a service course in this time slot ${course.timeSlots} please change time slot of service course`);
+                    return false;
+                }
+
             }
-            for(const day of this.days){
-                if(excludedDay===day) continue;
-                for( var i=0; i<=this.times.length-block[0]; i++){
-                    var currentTimes=this.times.slice(i,i+block[0]);
-                    const busyTime=this.getBusyTime(course.instructor,day);
-                    if(this.isInstructorSuitable(currentTimes,busyTime)){
-                        const classroom= this.getSuitableClassroom(course.students,currentTimes,day);
-                        if(classroom!=null && this.isTimeSlotsAvaiable(day,currentTimes,course.year)){
-                            currentTimes.forEach(hour=>{
-                                const timeIndex=this.getTimeIndex(hour);
-                                this.schedule[day][timeIndex].courses[course.year-1]=[course.code,classroom]
-                            })
-                            if(block.length>1){
-                                this.placeCourse(course,day,[block[1]])
+            return true;
+        },
+        placeCourse(course, excludedDay = "", block = null) {
+            isClassroomExist = false;
+            if (block == null) {//! if block is null that means this course is a block course (3)
+                block = course.hourPreference.trim().split('+').map(num => Number(num));//! hourpreference of course is (2+1) 
+            }
+            for (const day of this.days) {
+                if (excludedDay === day) continue;//for (x+y) courses, if x is placed on Monday, excludedDay will be Monday for y  
+                for (var i = 0; i <= this.times.length - block[0]; i++) {
+                    var currentTimes = this.times.slice(i, i + block[0]);//to take block of hours, if i equal 0 currentTimes will be ["8:30", "9:30", "10:30"]
+                    const busyTime = this.getBusyTime(course.instructor, day);
+                    if (this.isInstructorSuitable(currentTimes, busyTime)) {
+                        const classroom = this.getSuitableClassroom(course.students, currentTimes, day);
+                        if (classroom != null) {
+                            isClassroomExist == true;//! that means there exist at least one classroom, to error handling
+                            if (this.isTimeSlotsAvaiable(day, currentTimes, course.year)) {
+                                currentTimes.forEach(hour => {
+                                    const timeIndex = this.getTimeIndex(hour);
+                                    this.schedule[day][timeIndex].courses[course.year - 1] = [course.code, classroom]
+                                })
+                                if (block.length > 1) {//place remaining part(if it is exist)
+                                    this.placeCourse(course, day, [block[1]])
+                                }
+                                return true;
                             }
-                            return true;
                         }
                     }
                 }
             }
-            this.showSchedule=false;
-            console.log(course.code," ",block)
-            alert("no succes");
+            this.showSchedule = false;
+            console.log(course.code, " ", block)
+            if (isClassroomExist) {
+                alert(`There is no suitable time slot for course: ${course.code}`);
+            }
+            else {
+                alert(`There is no suitable classroom for course: ${course.code}`);
+            }
             return false;
         },
-        isTimeSlotsAvaiable(day,timeSlots,year){
-            isAvailable=true;
-            timeSlots.forEach(time=>{
-                course=this.schedule[day][this.times.indexOf(time)].courses[year-1];
-                if(course[0]!=null)//if any time slot is already used by another course 
-                isAvailable=false;
+        isTimeSlotsAvaiable(day, timeSlots, year) {
+            isAvailable = true;
+            timeSlots.forEach(time => {
+                course = this.schedule[day][this.times.indexOf(time)].courses[year - 1];
+                if (course[0] != null)//if any time slot is already used by another course 
+                    isAvailable = false;
             })
-            
+
             return isAvailable
         },
-        getBusyTime(instrutor,day){
-            busyTime=[]
-            this.busyTimes.forEach( time =>{
-                if(time.name === instrutor && time.day === day){
-                    time.times.forEach(hour=>{
+        getBusyTime(instrutor, day) {
+            busyTime = []
+            this.busyTimes.forEach(time => {
+                if (time.name === instrutor && time.day === day) {
+                    time.times.forEach(hour => {
                         busyTime.push(hour)//stores evry busy hours for a specific day and instructor
                     })
                 }
             })
             return busyTime.length > 0 ? busyTime : null;
         },
-        isInstructorSuitable(times,busyTime){
-            if(busyTime===null)//if instructor doesnt have any busy time
-            return true;
-            for(var i=0;i<times.length;++i){
-                if(busyTime.indexOf(times[i])>=0)
+        isInstructorSuitable(times, busyTime) {
+            if (busyTime === null)//if instructor doesnt have any busy time
+                return true;
+            for (var i = 0; i < times.length; ++i) {
+                if (busyTime.indexOf(times[i]) >= 0)
                     return false//return false if any element of time appears in the busyTime list
             }
             return true
