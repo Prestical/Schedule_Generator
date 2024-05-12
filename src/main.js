@@ -81,7 +81,26 @@ const app = Vue.createApp({
             this.currentView = view;
         },
         handleSubmit() {
-            console.log('Form submitted:', this.formData); // Show what submitted from form
+            // Modified from Dilek
+            const year = parseInt(this.formData.year);
+            const hourPreference = this.formData.hourPreference;
+            if (year < 1 || year > 4) {
+                alert('Year must be between 1 and 4.');
+                return false;
+            }
+            if (!/^(\d+\+\d+|\d+)$/.test(hourPreference)) {
+                alert('Hour preference must be a single number or two numbers separated by a "+".');
+                return false;
+            }
+            if (hourPreference.includes('+')) {
+                const parts = hourPreference.split('+').map(part => parseInt(part));
+                if (parts.some(isNaN)) {
+                    alert('Both parts of hour preference must be numbers.');
+                    return false;
+                }
+            }
+        
+            console.log('Form submitted:', this.formData);
             this.add();
         },
         addTime(time){

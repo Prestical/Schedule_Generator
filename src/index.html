@@ -83,7 +83,7 @@
                     </select>
                     <input v-if="key === 'timeSlots'" class="custom-input" :id="key" v-model="formData[key]" :required="true">
                 </div>
-                <input id="addInput" type="submit" value="Submit" @click="add">
+                <input id="addInput" type="submit" value="Submit" @click="add || handleSubmit">
             </form>
         </div>
         <div v-if=currentView==="remove" class="removeContainer"> 
