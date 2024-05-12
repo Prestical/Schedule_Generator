@@ -86,26 +86,26 @@ const app = Vue.createApp({
             const hourPreference = this.formData.hourPreference;
             const studentNum=Number(this.formData.students);
             const credit = Number(this.formData.credit);
-            if (isNaN(year)||year < 1 || year > 4) {
+            if (!(isNaN(year)) && year < 1 || year > 4) {
                 alert('Year must be number between 1 and 4.');
                 return false;
             }
-            if (!/^(\d+\+\d+|\d+)$/.test(hourPreference)) {
+            if ( !(isNaN(hourPreference)) && !/^(\d+\+\d+|\d+)$/.test(hourPreference)) {
                 alert('Hour preference must be a single number or two numbers separated by a "+".');
                 return false;
             }
-            if (hourPreference.includes('+')) {
+            if (!(isNaN(hourPreference)) && hourPreference.includes('+')) {
                 const parts = hourPreference.split('+').map(part => parseInt(part));
                 if (parts.some(isNaN)) {
                     alert('Both parts of hour preference must be numbers.');
                     return false;
                 }
             }
-            if(isNaN(studentNum)||studentNum<=0) {
+            if(!(isNaN(year)) && studentNum<=0) {
                 alert('Invalid case: student must be a number and bigger than 0');
                 return false;
             }
-            if(isNaN(credit)||credit<=0){
+            if(!(isNaN(year)) && credit<=0){
                 alert('Invalid case: credit must be a number and bigger than 0');
                 return false;
             }
