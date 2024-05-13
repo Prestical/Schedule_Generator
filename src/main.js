@@ -448,7 +448,7 @@ const app = Vue.createApp({
             if (this.placeCourses()) {
                 this.toggleView("schedule")
             }
-            this.displaySchedule();
+            //this.displaySchedule();
 
         },
         getSuitableClassroom(studentNum, timeSlots, day) {
@@ -580,7 +580,7 @@ const app = Vue.createApp({
                     return false//return false if any element of time appears in the busyTime list
             }
             return true
-        },
+        },/*
         displaySchedule() {//to display the schedule on console
             var sc = ""
             console.log("Schedule:\n         |     Year 1     |     Year 2     |     Year 3     |     Year 4    ");
@@ -597,6 +597,6 @@ const app = Vue.createApp({
                 });
             });
             return sc;
-        }
+        }*/
     }
 }).mount('#app');
