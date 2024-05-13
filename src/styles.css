@@ -210,6 +210,7 @@ select {
     height: 25px;
     border: none;
     outline: none;
+    text-align: center;
     
 }
 .addContainer h3 {
