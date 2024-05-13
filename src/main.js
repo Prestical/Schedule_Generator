@@ -326,6 +326,7 @@ const app = Vue.createApp({
                 reader.readAsText(file);
             })
             this.assignSections();
+            alert('All files loaded successfully');
 
         },
         async loadDefaultFiles() {
