@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+            <div class="toolbar">
+                <button @click="toggleView('upload')">UPLOAD FILES</button>
+                <button @click="generateSchedule">CREATE SCHEDULE</button>
+                <div @change="loadDefaultFiles" v-for="(section, index) in sections" class="dropdown" :key="section.dataSet">
+                    <button class="dropbtn">{{ section.title.toUpperCase() }}</button>
+                    <div class="dropdown-content" >
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; toggleView('add')">ADD</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; toggleView('edit')">EDIT</a>
+                        <a href="#" @click=" modalData=section.dataSet; modalType=section.type; toggleView('remove')">REMOVE</a>
+                    </div>
+                </div>
+            </div>
+            <!-- file uploading section -->
+            <div v-if="currentView === 'upload'">
+                <div class="drag-area" @dragover.prevent="dragOver" @dragleave.prevent="dragLeave" @drop.prevent="handleDrop" @click="triggerFileInput">
+                    <div class="icon">
+                        <img src="img/csvIcon.png" alt="csv icon" style="width: 75px;">
+                    </div>
+                    <h6> Drag & Drop Your Files/File <br> or Browse Files/File</h6>
+                    <span> Supported Format: csv </span>
+                    <input type="file" ref="fileInput"  @change="handleFiles"  accept=".csv"  multiple  hidden>
+                </div>
+            </div>
+            <!-- schedule section -->
+        <div class="scheduleContainer" v-if="currentView === 'schedule'">
+            <table>
+                <thead>
+                    <tr>
+                        <th>DAY</th>
+                        <th>Time</th>
+                        <th v-for="year in 4">Year {{ year }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="day in days" :key="day" :class="day.toLowerCase()">
+                        <td class="vertical-text">{{ day.toUpperCase() }}</td>
+                        <td>
+                            <ul>
+                                <li v-for="(time , index) in times" :key="index">{{ dayTimeSlots[index] }}</li>
+                            </ul>
+                        </td>
+                        <td v-for="year in 4" :key="`class-${year}`">
+                            <ul>
+                                <li v-html="getCourse(day,time,year)" v-for="time in times" :key="`time-${time}`"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- add,delete,edit operations section -->
+        <div class="addContainer" v-if=currentView==="add"> <!-- When we open add/remove/edit option it will show that csv file attribute-->
+            <h3> ADD AN ELEMENT TO {{modalType.toUpperCase()}} </h3>
+            <form id="addForm" @submit.prevent="handleSubmit">
+                <div v-if="modalType !== 'service' && modalType !== 'busy'" v-for="key in Object.keys(modalData[0])">
+                    <label class="custom-label">{{ key.toUpperCase() }}: </label>
+                    <input class="custom-input" :id="key" v-model="formData[key]" :required="true"><br>
+                </div>
+                <div v-if="modalType === 'service' || modalType === 'busy'" v-for="key in Object.keys(modalData[0])">
+                    <label class="custom-label">{{ key.toUpperCase() }}: </label>
+                    <select id="busyTimeSelec" v-if="modalType === 'busy' && key !== 'times'" v-model="formData[key]">
+                        <option v-if="key === 'name'" v-for="instructor in uniqueInstructors" :key="instructor" :value="instructor">{{ instructor }}</option>
+                        <option v-if="key === 'day'" v-for="day in days" :key="day" :value="day">{{ day }}</option>
+                        <!-- There is an error in time selection-->
+                    </select>
+                    <input v-if="key === 'times'" class="custom-input" :id="key" v-model="formData[key]" :required="true">
+                    <select id="serviceTimeSelec" v-if="modalType === 'service' && key !== 'timeSlots'" v-model="formData[key]">
+                        <option v-if="key === 'code'" v-for="course in courses" :key="course.code" :value="course.code">{{ course.code }}</option>
+                        <option v-if="key === 'day'" v-for="day in days" :key="day" :value="day">{{ day }}</option>
+                    </select>
+                    <input v-if="key === 'timeSlots'" class="custom-input" :id="key" v-model="formData[key]" :required="true">
+                </div>
+                <input id="addInput" type="submit" value="SUBMIT" @click="add || handleSubmit">
+            </form>
+        </div>
+        <div v-if=currentView==="remove" class="removeContainer"> 
+            <h3> REMOVE AN ELEMENT IN {{modalType.toUpperCase()}} </h3>
+            <div id="removeForm">
+                <p>PLEASE SELECT A COURSE</p>
+                <select v-model="selectedObject">
+                    <option disabled value="">Please select</option>
+                    <option v-if="modalType !== 'service' && modalType !== 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name }}</option>
+                    <option id="busyOption" v-if="modalType === 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name}} {{object.times}}</option>
+                    <option v-if="modalType === 'service'" v-for="object in modalData" :key="object.code" :value="object">{{ object.code }}</option>
+                </select>
+                <p v-if="modalType !== 'service'">Selected Object: {{ selectedObject.name }}</p>
+                <p v-if="modalType === 'service'">Selected Object: {{ selectedObject.code }}</p>
+                <button @click="remove">REMOVE</button>
+            </div>
+        </div>
+        <div v-if=currentView==="edit" class="editContainer"> 
+            <h3 id="editH"> EDIT AN ELEMENT IN {{modalType.toUpperCase()}} </h3>
+            <div id="editForm">
+                <p id="editP">PLEASE SELECT AN COURSE</p>
+                <select v-model="selectedObject">
+                    <option disabled value=""></option>
+                    <option v-if="modalType !== 'service' && modalType !== 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name}}</option>
+                    <option v-if="modalType === 'busy'" v-for="object in modalData" :key="object.code" :value="object">{{ object.name}} {{object.times}}</option>
+                    <option v-if="modalType === 'service'" v-for="object in modalData" :key="object.code" :value="object">{{ object.code }}</option>
+                </select>
+                <!-- It shows the current properties of the course. It changes dynamically. -->
+                <div v-if="selectedObject">
+                    <template v-for="element in Object.entries(selectedObject)">
+                        <p> {{element[0].toUpperCase()}}: {{element[1]}} </p>
+                    </template>
+                </div>
+                <select v-if="selectedObject" v-model="editOption">
+                    <p>Select the feature you want to edit</p>
+                    <option disabled value="">Select the feature you want to edit</option>
+                    <option v-for="entry in Object.entries(modalData[0])" :key="entry[0]" :value="entry[0]">{{ entry[0].toUpperCase()}}</option>
+                </select>
+                <div v-if="editOption !== '' && selectedObject">
+                    <template v-for="element in Object.keys(selectedCourse)">
+                        <input v-model="newValue" :placeholder="`Enter new ${element}`" v-if="editOption === element">
+                    </template>
+                    <button @click="edit">EDIT</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="currentView === 'remove' || currentView === 'edit'||currentView === 'add'" class="tooltip-container">
+            <button @click="saveChanges(); currentView= 'menu'"  id="saveBtn"> SAVE CHANGES TO FILE</button>
+            <span class="tooltip-text">If you want to use the save button, you must work on the server (server.js).</span>
+        </div>
+
+    </div>
+</body>
+</html>
