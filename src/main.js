@@ -105,11 +105,11 @@ const app = Vue.createApp({
                     return false;
                 }
             }
-            else if (this.modalType === "busy" && !(this.formData.times.split(",").every(t => this.times.includes(t)))) {
+            else if (this.modalType === "busy" && !(this.formData.times.split(",").every(t => this.times.includes(t))||!(this.days.includes(this.formData.day))) ) {
                 alert('Invalid case: time must be proper format (8:30 or 12:30) and between 8:30 and 15:30');
                 return false;
             }
-            else if (this.modalType === "service" && !(this.formData.timeSlots.split(",").every(t => this.times.includes(t)))) {
+            else if (this.modalType === "service" && !(this.formData.timeSlots.split(",").every(t => this.times.includes(t))||!(this.days.includes(this.formData.day)))) {
                 alert('Invalid case: time must be proper format ()');
                 return false;
             }
@@ -117,6 +117,7 @@ const app = Vue.createApp({
                 alert('Invalid case: capacity must be a number and bigger than 0');
                 return false;
             }
+            console.log(this.formData.day)
 
             console.log('Form submitted:', this.formData);
             this.add();
@@ -165,6 +166,7 @@ const app = Vue.createApp({
         },
         edit() { // Cant save the changes to the specific array (it can show changes immediately in same page)
             if (this.modalType === "Courses") {
+                
                 const year = Number(this.newValue);
                 const hourPreference = this.newValue;
                 const studentNum = Number(this.newValue);
@@ -190,13 +192,18 @@ const app = Vue.createApp({
                     return false;
                 }
             }
+            else if(this.editOption === "day"&& !(this.days.includes(this.newValue))){
+                alert('Invalid case: day must be between Monday and Friday and first letter must be upper case!');
+                this.resetElements();
+                return false;
+            }
             else if (this.editOption === 'times' && (this.modalType === "busy" && !(this.newValue.split(",").every(t => this.times.includes(t))))) {
                 alert('Invalid case: time must be proper format (8:30 or 12:30) and between 8:30 and 15:30');
                 this.resetElements();
                 return false;
             }
             else if (this.editOption === 'timeSlots' && (this.modalType === "service" && !(this.newValue.split(",").every(t => this.times.includes(t))))) {
-                alert('Invalid case: time must be proper format ()');
+                alert('Invalid case: time must be proper format (8:30 or 12:30) and between 8:30 and 15:30');
                 this.resetElements();
                 return false;
             }
@@ -264,6 +271,9 @@ const app = Vue.createApp({
             if (this.selectedObject) {
                 if (this.modalType === 'Courses') {
                     this.courses = this.courses.filter(obj => obj.code !== this.selectedObject.code);
+                    if(this.selectedObject.department === 'S'){
+                        this.serviceCourses = this.serviceCourses.filter(obj => obj.code !== this.selectedObject.code);
+                    }
                     this.modalData = this.courses;
                 } else if (this.modalType === 'busy') {
                     // Solved the deleting duplicated names
@@ -365,6 +375,7 @@ const app = Vue.createApp({
                 const responseData = await response.json();
                 console.log(responseData);  // Log the response data from the server
             } catch (error) {
+                alert("An error occurred while updating file please check the console for more details")
                 console.error('Error:', error);
             }
         },
@@ -385,14 +396,33 @@ const app = Vue.createApp({
                 if (line.trim() === '')
                     return;
                 const parts = line.split(',');
+                const year =Number(parts[2].trim());
+                const students = Number(parts[6].trim());
+                const credit=Number(parts[3].trim());
+                if( isNaN(year) || !(year >= 1 && year <=5)){
+                    alert("An error occurred while reading file, please check the console for more information");
+                    throw new Error('Please check course file, there is an error about course year: '+line);
+                }
+                if(isNaN(students) || !(students>0)){
+                    alert("An error occurred while reading file, please check the console for more information");
+                    throw new Error('Please check course file, there is an error about course students: '+line);
+                }
+                if (!/^(\d+\+\d+|\d+)$/.test(parts[8].trim())) {
+                    alert("An error occurred while reading file, please check the console for more information");
+                    throw new Error('Please check course file, there is an error about course hourPreference: '+line);
+                }
+                if(isNaN(credit) || !(credit>0)){
+                    alert("An error occurred while reading file, please check the console for more information");
+                    throw new Error('Please check course file, there is an error about course credit: '+line);
+                }
                 result.push({
                     code: parts[0].trim(),
                     name: parts[1].trim(),
-                    year: parts[2].trim(),
-                    credit: parts[3].trim(),
+                    year: year,
+                    credit: credit,
                     type: parts[4].trim(),
                     department: parts[5].trim(),
-                    students: Number(parts[6].trim()),
+                    students: students,
                     instructor: parts[7].trim(),
                     hourPreference: parts[8]
                 })
@@ -407,7 +437,8 @@ const app = Vue.createApp({
                     return;
                 const parts = line.split(',');
                 const timeParts = parts.slice(2).map(time => time.replace(/"/g, '').trim());
-                if (!timeParts.every(time => this.times.includes(time))) throw new Error(`Invalid case: ${line}`);
+                if (!timeParts.every(time => this.times.includes(time))) throw new Error(`Invalid case; there is a problem about times in: ${line}`);
+                if(!this.days.includes(parts[1].trim())) throw new Error(`Invalid case; there is a problem about days in: ${line}`);
                 result.push({ name: parts[0].trim(), day: parts[1].trim(), times: timeParts });
             })
             this.busyTimes = result;
@@ -420,7 +451,8 @@ const app = Vue.createApp({
                     return;
                 const parts = line.split(',').map(element => element.trim());
                 const times = parts.slice(2).map(time => time.replace(/"/g, '').trim());
-                if (!times.every(time => this.timeRegex.test(time))) throw new Error(`Invalid case: ${line}`);
+                if (!times.every(time => this.timeRegex.test(time))) throw new Error(`Invalid case; there is a problem about times in: ${line}`);
+                if(!this.days.includes(parts[1].trim())) throw new Error(`Invalid case; there is a problem about days in: ${line}`);
                 result.push({
                     code: parts[0].trim(),
                     day: parts[1].trim(),
@@ -436,6 +468,11 @@ const app = Vue.createApp({
                 if (line.trim() == '')
                     return;
                 const parts = line.split(';')
+                const capacity = Number(parts[1].trim());
+                if(isNaN(capacity)|| capacity <=0 ){
+                    alert("An error occurred while reading file, please check the console for more information");
+                    throw new Error('Please check classroom file, there is an error about classroom capacity: '+line);
+                }
                 result.push({
                     name: parts[0].trim(),
                     capacity: Number(parts[1].trim())
