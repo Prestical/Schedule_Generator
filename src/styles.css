@@ -18,6 +18,7 @@ table {
     width: 60%;
     height: 30%;
     border-collapse: collapse; 
+    margin-top: auto; 
 }
 th, td {
     border: 1px solid rgba(0,0,0,0.1); 

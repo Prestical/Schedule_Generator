@@ -13,7 +13,7 @@ const app = Vue.createApp({
             classrooms: [],
             days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             times: ["8:30", "9:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30"],
-            dayTimeSlots:["08:30 - 09:20", "09:30 - 10:20", "10:30 - 11:20", "11:30 - 12:20", "12:30 - 13:20", "13:30 - 14:20", "14:30 - 15:20", "15:30 - 16:20"],
+            dayTimeSlots: ["08:30 - 09:20", "09:30 - 10:20", "10:30 - 11:20", "11:30 - 12:20", "12:30 - 13:20", "13:30 - 14:20", "14:30 - 15:20", "15:30 - 16:20"],
             modalData: null,
             modalType: null,
             sections: [//elements of toolbar 
@@ -109,11 +109,11 @@ const app = Vue.createApp({
                 alert('Invalid case: time must be proper format (8:30 or 12:30) and between 8:30 and 15:30');
                 return false;
             }
-            else if (this.modalType === "service" &&!(this.formData.timeSlots.split(",").every(t => this.times.includes(t)))) {
+            else if (this.modalType === "service" && !(this.formData.timeSlots.split(",").every(t => this.times.includes(t)))) {
                 alert('Invalid case: time must be proper format ()');
                 return false;
             }
-            else if(this.modalType==="classroom"&&(isNaN(Number(this.formData.capacity.trim()))||Number(this.formData.capacity.trim())<=0)){
+            else if (this.modalType === "classroom" && (isNaN(Number(this.formData.capacity.trim())) || Number(this.formData.capacity.trim()) <= 0)) {
                 alert('Invalid case: capacity must be a number and bigger than 0');
                 return false;
             }
@@ -190,17 +190,17 @@ const app = Vue.createApp({
                     return false;
                 }
             }
-            else if ( this.editOption === 'times' && (this.modalType === "busy" && !(this.newValue.split(",").every(t => this.times.includes(t))))) {
+            else if (this.editOption === 'times' && (this.modalType === "busy" && !(this.newValue.split(",").every(t => this.times.includes(t))))) {
                 alert('Invalid case: time must be proper format (8:30 or 12:30) and between 8:30 and 15:30');
                 this.resetElements();
                 return false;
             }
-            else if ( this.editOption === 'timeSlots' && (this.modalType === "service" &&!(this.newValue.split(",").every(t => this.times.includes(t))))) {
+            else if (this.editOption === 'timeSlots' && (this.modalType === "service" && !(this.newValue.split(",").every(t => this.times.includes(t))))) {
                 alert('Invalid case: time must be proper format ()');
                 this.resetElements();
                 return false;
             }
-            else if(this.editOption === 'capacity' && (this.modalType==="classroom"&&(isNaN(Number(this.newValue.trim()))||Number(this.newValue.trim())<=0))){
+            else if (this.editOption === 'capacity' && (this.modalType === "classroom" && (isNaN(Number(this.newValue.trim())) || Number(this.newValue.trim()) <= 0))) {
                 alert('Invalid case: capacity must be a number and bigger than 0');
                 this.resetElements();
                 return false;
@@ -251,7 +251,7 @@ const app = Vue.createApp({
             console.log(this.selectedObject);
             this.resetElements();
         },
-        resetElements(){
+        resetElements() {
             this.newValue = ''; // Reset the input field
             this.editOption = ''; // Reset the edit option
             this.selectedObject = {};
@@ -310,11 +310,13 @@ const app = Vue.createApp({
                         alert(`Error parsing ${file.name}: ${parseError.message}`);
                         return;
                     }
+
                 };
+                console.log(`${file.name} loaded successfully!`);
                 reader.readAsText(file);
             })
             this.assignSections();
-            console.log("Files loaded successfully!")
+
         },
         async loadDefaultFiles() {
             try {
@@ -405,7 +407,7 @@ const app = Vue.createApp({
                     return;
                 const parts = line.split(',');
                 const timeParts = parts.slice(2).map(time => time.replace(/"/g, '').trim());
-                if (!timeParts.every(time  => this.times.includes(time))) throw new Error(`Invalid case: ${line}`);
+                if (!timeParts.every(time => this.times.includes(time))) throw new Error(`Invalid case: ${line}`);
                 result.push({ name: parts[0].trim(), day: parts[1].trim(), times: timeParts });
             })
             this.busyTimes = result;
@@ -446,6 +448,7 @@ const app = Vue.createApp({
             if (this.placeCourses()) {
                 this.toggleView("schedule")
             }
+            this.displaySchedule();
 
         },
         getSuitableClassroom(studentNum, timeSlots, day) {
@@ -578,22 +581,22 @@ const app = Vue.createApp({
             }
             return true
         },
-        /*displaySchedule() {//to display the schedule on console
-            var sc=""
-            console.log("Schedule:\n         |       Year 1      |       Year 2      |       Year 3      |       Year 4       ");
+        displaySchedule() {//to display the schedule on console
+            var sc = ""
+            console.log("Schedule:\n         |     Year 1     |     Year 2     |     Year 3     |     Year 4    ");
             this.days.forEach(day => {
                 console.log(day);
                 this.schedule[day].forEach(slot => {
                     const formatTime = time => `${time.split(':')[0].padStart(2, '0')}:${time.split(':')[1]}`;
                     let line = `${formatTime(slot.time)} | `;
                     slot.courses.forEach(course => {
-                        line += `${course[1] ? course[0]+" "+course[1]+" "+course[2] : '                   '}  `;
+                        line += `${course[1] ? "  "+course[0] + " " + course[1]+"   " : '                 '}  `;
                     });
-                    sc=sc+line+"\n";
+                    sc = sc + line + "\n";
                     console.log(line);
                 });
             });
             return sc;
-        }*/
+        }
     }
 }).mount('#app');
